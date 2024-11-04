@@ -124,11 +124,10 @@ namespace oris_ai {
 
     /**
      * @brief Converts multi-dimensional indices to a flat index for 1D memory access.
-     * 
-     * @param indices A vector of indices specifying the location in the tensor.
+     * @param indices A pointer to an array of size_t representing the multi-dimensional indices.
      * @return The flat index corresponding to the given multi-dimensional indices.
      */
-    size_t FlattenIndex(const std::vector<size_t>& indices) const;
+    size_t FlattenIndex(const size_t* indices) const;
 
     /**
      * @brief Converts multi-dimensional indices to a flat index for 1D memory access, using a specified shape.

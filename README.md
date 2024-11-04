@@ -7,7 +7,10 @@ Oris_AI is a deep learning framework especially for on-devices.
  - Activation: SiLU
  - Output: Detect(Yolo v8)
 
-## 2. Requirements
+## 2. Supported DNN
+ - Detection: Yolo v8
+
+## 3. Requirements
 
 Component | Recommended version | Command to check the version
 --------- | --------------- | ----------------------------
@@ -17,14 +20,14 @@ cmake | 3.30.2 | cmake --version
 cudatoolkit | 12.1 | nvcc --version
 cudnn | 9.1 | cat /usr/local/cuda/include/cudnn_version.h | grep CUDNN_MAJOR -A 2
 
-## 3. Prerequisites
+## 4. Prerequisites
 - cmake [Required]
 - protobuf [Required]
 - glog [Required]
 - OpenCV [Required] : https://github.com/opencv/opencv
 - OpenBLAS [Required] : https://github.com/xianyi/OpenBLAS.git
 
-### 3-1. cmake
+### 4-1. cmake
 We recommend using the latest version of cmake. The latest version of cmake can be found at: [https://cmake.org/download/]
 
 If needed, cmake can also be installed using the following commands. However, please note that installing via `apt-get` may not provide the latest version of cmake:
@@ -34,26 +37,26 @@ $ sudo apt-get install cmake
 $ sudo apt-get install cmake-curses-gui # Only needed if you plan to use ccmake
 ```
 
-### 3-2. protobuf
+### 4-2. protobuf
 ```
 $ sudo apt-get install libprotobuf-dev
 ```
 
-### 3-3. glog
+### 4-3. glog
 ```
 $ sudo apt-get install libgoogle-glog-dev
 ```
 
-### 3-4. OpenCV
+### 4-4. OpenCV
 To do
 
-### 3-5. OpenBLAS
+### 4-5. OpenBLAS
 To do
 
-## 4. How to compile Oris_AI
+## 5. How to compile Oris_AI
 The installation path of Oris_AI (currently {ORIS_AI_OSS_PATH}) needs to be modified to suit your environment.
 
-### 4-1. Native compile
+### 5-1. Native compile
 ```
 $ cd {ORIS_AI_OSS_PATH}
 $ mkdir build
@@ -62,14 +65,14 @@ $ cmake ..
 $ make -j$(nproc)
 ```
 
-### 4-2. Cmake configuration
+### 5-2. Cmake configuration
 Use `ccmake`
 ```
 $ cd {ORIS_AI_OSS_PATH}/build
 $ ccmake ..
 ```
 
-## 5. How to run Oris_AI
+## 6. How to run Oris_AI
 The source codes of example are located in the following path.
 ```
 {ORIS_AI_OSS_PATH}/src/oris_ai/examples
@@ -80,9 +83,9 @@ The binaries of example are located in the following path.
 {ORIS_AI_OSS_PATH}/build/bin
 ```
 
-## 6. Example
+## 7. Example
 
-### 6-1. Basic Tensor Operation
+### 7-1. Basic Tensor Operation
 {ORIS_AI_OSS_PATH}/src/oris_ai/examples/test_tensor_basic.cc
 ```
 int main(int argc, char** argv) {
@@ -133,7 +136,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-### 6-2. Premute Tensor
+### 7-2. Premute Tensor
 {ORIS_AI_OSS_PATH}/src/oris_ai/examples/test_tensor_permute.cc
 ```
 int main(int argc, char** argv) {
