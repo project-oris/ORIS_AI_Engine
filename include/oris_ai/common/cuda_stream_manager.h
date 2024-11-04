@@ -2,8 +2,7 @@
 // Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
 // All Rights Reserved.
 ******************************************************************************/
-#ifndef INCLUDE_ORIS_AI_COMMON_CUDA_STREAM_MANAGER_H_
-#define INCLUDE_ORIS_AI_COMMON_CUDA_STREAM_MANAGER_H_
+#pragma once
 
 #include "oris_ai/common/cuda_define.h"
 
@@ -22,6 +21,16 @@ public:
    * Cleans up the CUDA stream
    */
   ~CUDAStreamManager();
+
+  /**
+   * @brief Deleted copy constructor to prevent copying of the singleton instance.
+   */
+  CUDAStreamManager(const CUDAStreamManager&) = delete;
+
+  /**
+   * @brief Deleted copy assignment operator to prevent assignment of the singleton instance.
+   */
+  CUDAStreamManager& operator=(const CUDAStreamManager&) = delete;
 
   /**
    * @brief Singleton instance getter for CUDAStreamManager
@@ -44,5 +53,3 @@ private:
 };
 
 }  // namespace oris_ai
-
-#endif  // INCLUDE_ORIS_AI_COMMON_CUDA_STREAM_MANAGER_H_

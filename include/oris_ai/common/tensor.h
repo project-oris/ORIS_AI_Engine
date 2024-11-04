@@ -2,21 +2,21 @@
 // Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
 // All Rights Reserved.
 ******************************************************************************/
-#ifndef INCLUDE_ORIS_AI_COMMON_TENSOR_H_
-#define INCLUDE_ORIS_AI_COMMON_TENSOR_H_
+#pragma once
 
+#include <optional>   // for std::optional
 #include <vector>
 
 namespace oris_ai {
 
   /**
    * @enum Device
-   * @brief Enum to specify the device where the tensor is stored (CPU, GPU, SYNCED).
+   * @brief Enum to specify the device where the tensor is stored (UNINIT, CPU, GPU).
    */
   enum class Device { 
-      CPU,   /** Tensor stored in CPU memory */
-      GPU,   /** Tensor stored in GPU memory */
-      SYNCED /** Tensor data is synchronized across CPU and GPU */
+    UNINIT, /** Tensor location is not initialized */
+    CPU,    /** Tensor stored in CPU memory */
+    GPU     /** Tensor stored in GPU memory */
   };
 
   /**
@@ -29,20 +29,12 @@ namespace oris_ai {
   class Tensor {
   public:
     /**
-     * @brief Constructs a Tensor with the given shape and device.
+     * @brief Constructor for creating a Tensor object.
      * 
-     * This constructor initializes a Tensor object with the specified shape and allocates memory 
-     * on the specified device. 
-     * 
-     * - If the device is set to `Device::CPU`, the tensor will be allocated and used only in CPU memory.
-     * - If the device is set to `Device::GPU`, the tensor will be allocated in both CPU and GPU memory, 
-     *   allowing data to be transferred and used across both devices.
-     * 
-     * @param shape A vector specifying the dimensions of the tensor.
-     * @param device The device where the tensor will be allocated. The default is `Device::CPU`.
+     * @param shape Shape of the tensor.
+     * @param cpu_only If true, the tensor will only allocate memory on the CPU. Default is false.
      */
-    Tensor(const std::vector<size_t>& shape, Device device = Device::CPU);
-
+    Tensor(const std::vector<size_t>& shape, bool cpu_only = false);
 
     /**
      * @brief Destructor that frees the allocated memory.
@@ -50,63 +42,29 @@ namespace oris_ai {
     ~Tensor();
 
     /**
-     * @brief Retrieves the data from CPU memory, copying from GPU if necessary.
-     * 
-     * This method provides two functionalities based on the parameters passed:
-     * - If no parameters are provided, it returns a pointer to the entire data stored in CPU memory.
-     * - If a multi-dimensional index is provided, it returns a reference to the specific element at the given index.
+     * @brief Retrieves a pointer to the data stored in CPU memory, copying from GPU if necessary.
      * 
      * @return T* Pointer to the data in CPU memory.
      */
-    T* GetCPUData();
+    T* GetCPUDataPtr();
 
     /**
-     * @brief Retrieves the element from CPU memory at the specified multi-dimensional index, copying from GPU if necessary.
+     * @brief Retrieves a pointer to the data stored in GPU memory, copying from CPU if necessary.
      * 
-     * This method takes a vector of indices representing the multi-dimensional index in the tensor.
-     * It converts the multi-dimensional index into a 1D index and returns a reference to the element at that position.
-     * If the data is currently stored on the GPU, it is copied to the CPU before accessing the element.
+     * @return T* Pointer to the data in GPU memory.
+     */
+    T* GetGPUDataPtr();
+
+    /**
+     * @brief Retrieves a reference to the tensor element in CPU memory at a specific multi-dimensional index, copying from GPU if necessary.
      * 
-     * @param indices A vector specifying the multi-dimensional index of the element.
+     * @param indices A vector specifying the multi-dimensional index of the desired element in the tensor.
      * @return T& Reference to the element in CPU memory at the specified index.
-     * @throws std::invalid_argument if the number of indices does not match the tensor dimensions.
-     * 
-     * @code
-     * // Example usage:
-     * // Suppose we have a 3D tensor with dimensions 4x4x4.
-     * std::vector<size_t> shape = {4, 4, 4};
-     * oris_ai::Tensor<float> tensor(shape, oris_ai::Device::CPU);
-     * 
-     * // Set some data in the tensor (for example, initializing the tensor with 1.0).
-     * tensor.SetCPUData(1.0f);
-     * 
-     * // Now, retrieve the element at the position (2, 3, 1).
-     * std::vector<size_t> indices = {2, 3, 1};
-     * float& value = tensor.GetCPUData(indices);
-     * 
-     * // You can now access or modify the element at this position.
-     * std::cout << "The value at (2, 3, 1) is: " << value << std::endl;
-     * 
-     * // Modify the value at (2, 3, 1).
-     * value = 5.0f;
-     * 
-     * // Verify the change.
-     * std::cout << "The modified value at (2, 3, 1) is: " << tensor.GetCPUData(indices) << std::endl;
-     * @endcode
      */
     T& GetCPUData(const std::vector<size_t>& indices);
 
-
-
     /**
-     * @brief Retrieves the data from GPU memory, copying from CPU if necessary.
-     * 
-     * @return Pointer to the data in GPU memory.
-     */
-    T* GetGPUData();
-
-    /**
-     * @brief Initializes the tensor with a specific value.
+     * @brief Set the Tensor data to a specific value for all elements.
      * 
      * @param init The value to initialize the data with.
      */
@@ -114,27 +72,12 @@ namespace oris_ai {
 
     /**
      * @brief Transfers the tensor data to the specified device (CPU or GPU).
-     *
      * This function transfers the tensor's data between CPU and GPU, depending on the
      * specified device. If the data is already on the specified device, no transfer is performed.
      * 
      * @param device The target device to transfer the data to. 
      *               Use Device::CPU to move data to CPU memory or Device::GPU to move data to GPU memory.
      *
-     * @note This function internally calls either GetCPUData() or GetGPUData() to handle
-     *       the memory transfer.
-     * 
-     * @example
-     * @code
-     * oris_ai::Tensor<float> tensor({4, 4, 4}, oris_ai::Device::CPU);
-     * tensor.SetCPUData(1.0f);
-     * 
-     * // Transfer data to GPU
-     * tensor.To(oris_ai::Device::GPU);
-     * 
-     * // Transfer data back to CPU
-     * tensor.To(oris_ai::Device::CPU);
-     * @endcode
      */
     void To(Device device);
 
@@ -147,15 +90,22 @@ namespace oris_ai {
      */
     const std::vector<size_t>& Shape() const;
 
+    /**
+     * @brief Permute the dimensions of the tensor.
+     * 
+     * @param dims A vector specifying the new order of dimensions.
+     */
+    void Permute(const std::vector<size_t>& dims);
+
   private:
     std::vector<size_t> shape_;     /** Stores the shape (dimensions) of the tensor */
     size_t total_count_;            /** Total number of elements in the tensor */
     size_t total_bytes_;            /** Total number of bytes required by the tensor */
-    Device device_;                 /** The current device where the tensor is stored */
     Device head_;                   /** Tracks the device with the latest valid data */
 
     T* cpu_data_ptr_;               /** Pointer to the data stored in CPU memory */
-    T* gpu_data_ptr_;               /** Pointer to the data stored in GPU memory */
+    // T* gpu_data_ptr_;               /** Pointer to the data stored in GPU memory */
+    std::optional<T*> gpu_data_ptr_;        /** Optional pointer to the data stored in GPU memory */
 
     /**
      * @brief Allocates memory for the tensor in CPU memory.
@@ -168,14 +118,45 @@ namespace oris_ai {
     void AllocateGPUMemory();
 
     /**
+     * @brief Handles the copying of data from GPU to CPU and updates the head.
+     * This method consolidates the common logic for transferring data from GPU
+     * to CPU or initializing CPU state when the head is uninitialized.
+     */
+    void EnsureCPUDataReady();
+
+    /**
      * @brief Converts multi-dimensional indices to a flat index for 1D memory access.
      * 
      * @param indices A vector of indices specifying the location in the tensor.
      * @return The flat index corresponding to the given multi-dimensional indices.
      */
     size_t FlattenIndex(const std::vector<size_t>& indices) const;
+
+    /**
+     * @brief Converts multi-dimensional indices to a flat index for 1D memory access, using a specified shape.
+     * 
+     * This function calculates the flat index corresponding to a given multi-dimensional index based on the 
+     * provided shape of the tensor. This is useful for accessing elements in a linearized 1D memory layout.
+     * 
+     * @param indices A vector of indices specifying the location in the tensor.
+     * @param shape A vector representing the shape (dimensions) of the tensor to use for flattening.
+     * @return The flat index corresponding to the given multi-dimensional indices.
+     */
+    size_t FlattenIndex(const std::vector<size_t>& indices, const std::vector<size_t>& shape) const;
+
+    /**
+     * @brief Increments multi-dimensional indices for tensor traversal.
+     * 
+     * This function takes a multi-dimensional index and increments it to the next element
+     * in the tensor, considering the specified shape. If the index reaches the end along any dimension,
+     * it resets that dimension's index to zero and increments the next more significant dimension.
+     * 
+     * @param indices A vector of indices to be incremented.
+     * @param shape A vector representing the shape (dimensions) of the tensor.
+     * @return A boolean value indicating whether the increment was successful.
+     *         Returns false if the end of all dimensions has been reached.
+     */
+    bool IncrementIndices(std::vector<size_t>& indices, const std::vector<size_t>& shape) const;
   };
 
 } // namespace oris_ai
-
-#endif  // INCLUDE_ORIS_AI_COMMON_TENSOR_H_

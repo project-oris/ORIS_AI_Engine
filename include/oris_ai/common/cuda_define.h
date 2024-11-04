@@ -2,18 +2,22 @@
 // Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
 // All Rights Reserved.
 ******************************************************************************/
-#ifndef INCLUDE_ORIS_AI_COMMON_CUDA_DEFINE_H_
-#define INCLUDE_ORIS_AI_COMMON_CUDA_DEFINE_H_
+#pragma once
 
 #include <cuda_runtime.h>
 #include <glog/logging.h>
 
-// CUDA: various checks for different function calls.
+/**
+ * @brief Macro to check CUDA function calls for errors.
+ * 
+ * This macro evaluates a given CUDA function call and checks if it returns a 
+ * success status. If an error occurs, the macro logs the error message.
+ * 
+ * @param condition The CUDA function call to be checked.
+ */
 #define CUDA_CHECK(condition) \
   /* Code block avoids redefinition of cudaError_t error */ \
   do { \
     cudaError_t error = condition; \
     CHECK_EQ(error, cudaSuccess) << " " << cudaGetErrorString(error); \
   } while (0)
-
-# endif   // INCLUDE_ORIS_AI_COMMON_CUDA_DEFINE_H_
