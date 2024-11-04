@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
   std::cout << "Tensor shape: ";
   const std::vector<size_t>& tensor_shape = tensor.Shape();
   for (size_t dim : tensor_shape) {
-      std::cout << dim << " ";
+    std::cout << dim << " ";
   }
   std::cout << std::endl;
 
@@ -22,16 +22,16 @@ int main(int argc, char** argv) {
   std:: cout << "Set CPU Data" << std::endl;
   tensor.SetCPUData(1.0f);
 
-  // 초기화된 값을 모두 출력합니다.
+  // // 초기화된 값을 모두 출력합니다.
   // std::cout << "Initial tensor values:" << std::endl;
   // for (size_t i = 0; i < shape[0]; ++i) {
-  //     for (size_t j = 0; j < shape[1]; ++j) {
-  //         for (size_t k = 0; k < shape[2]; ++k) {
-  //             std::vector<size_t> idx = {i, j, k};
-  //             std::cout << "tensor[" << i << "][" << j << "][" << k << "] = " 
-  //                       << tensor.GetCPUData(idx) << std::endl;
-  //         }
+  //   for (size_t j = 0; j < shape[1]; ++j) {
+  //     for (size_t k = 0; k < shape[2]; ++k) {
+  //       std::vector<size_t> idx = {i, j, k};
+  //       std::cout << "tensor[" << i << "][" << j << "][" << k << "] = " 
+  //                 << tensor.GetCPUData(idx) << std::endl;
   //     }
+  //   }
   // }
 
   // CPU에서 GPU로 데이터를 복사합니다.

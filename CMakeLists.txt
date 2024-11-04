@@ -20,7 +20,11 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Lib 디렉토리 및 라이브러리 설정
 link_directories(${PROJECT_SOURCE_DIR}/lib)
-set(TARGET_LIB Oris_AI)
+set(ORIS_LIB Oris_AI)
+
+# 필수 설치 패키지
+set(target_libraries "")
+include(${PROJECT_SOURCE_DIR}/cmake/Packages.cmake)
 
 ####################################################################
 # examples 디렉토리에서 사용할 실행 파일을 설정하고 ORIS_AI_LIBS를 링크
@@ -30,8 +34,8 @@ foreach(EXAMPLE_SRC ${EXAMPLES_SRCS})
   get_filename_component(EXAMPLE_NAME ${EXAMPLE_SRC} NAME_WE)
 
   # 예시 파일을 빌드
-  add_executable(${EXAMPLE_NAME} ${EXAMPLE_SRC} ${ORIS_AI_OBJECTS})
+  add_executable(${EXAMPLE_NAME} ${EXAMPLE_SRC})
 
   # 예제에 라이브러리 연결
-  target_link_libraries(${EXAMPLE_NAME} ${TARGET_LIB})
+  target_link_libraries(${EXAMPLE_NAME} ${ORIS_LIB} ${target_libraries})
 endforeach()
