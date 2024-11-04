@@ -4,8 +4,10 @@
 ******************************************************************************/
 #pragma once
 
+#include <stdio.h>   // for fprintf
+#include <stdlib.h>  // for exit
+
 #include <cuda_runtime.h>
-#include <glog/logging.h>
 
 /**
  * @brief Macro to check CUDA function calls for errors.
@@ -15,9 +17,11 @@
  * 
  * @param condition The CUDA function call to be checked.
  */
-#define CUDA_CHECK(condition) \
-  /* Code block avoids redefinition of cudaError_t error */ \
-  do { \
-    cudaError_t error = condition; \
-    CHECK_EQ(error, cudaSuccess) << " " << cudaGetErrorString(error); \
+#define CUDA_CHECK(condition)                                         \
+  do {                                                                \
+    cudaError_t error = (condition);                                  \
+    if (error != cudaSuccess) {                                       \
+      fprintf(stderr, "CUDA error: %s\n", cudaGetErrorString(error)); \
+      exit(EXIT_FAILURE);                                             \
+    }                                                                 \
   } while (0)

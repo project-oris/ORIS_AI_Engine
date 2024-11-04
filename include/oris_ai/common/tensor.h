@@ -4,7 +4,6 @@
 ******************************************************************************/
 #pragma once
 
-#include <optional>   // for std::optional
 #include <vector>
 
 namespace oris_ai {
@@ -104,8 +103,7 @@ namespace oris_ai {
     Device head_;                   /** Tracks the device with the latest valid data */
 
     T* cpu_data_ptr_;               /** Pointer to the data stored in CPU memory */
-    // T* gpu_data_ptr_;               /** Pointer to the data stored in GPU memory */
-    std::optional<T*> gpu_data_ptr_;        /** Optional pointer to the data stored in GPU memory */
+    T* gpu_data_ptr_;               /** Pointer to the data stored in GPU memory */
 
     /**
      * @brief Allocates memory for the tensor in CPU memory.
@@ -142,14 +140,14 @@ namespace oris_ai {
      * @param shape A vector representing the shape (dimensions) of the tensor to use for flattening.
      * @return The flat index corresponding to the given multi-dimensional indices.
      */
-    size_t FlattenIndex(const std::vector<size_t>& indices, const std::vector<size_t>& shape) const;
+    // size_t FlattenIndex(const std::vector<size_t>& indices, const std::vector<size_t>& shape) const;
 
     /**
      * @brief Increments multi-dimensional indices for tensor traversal.
      * 
-     * This function takes a multi-dimensional index and increments it to the next element
-     * in the tensor, considering the specified shape. If the index reaches the end along any dimension,
-     * it resets that dimension's index to zero and increments the next more significant dimension.
+     * This function takes a multi-dimensional index and increments it to point to the next element
+     * in the tensor, based on the specified shape. If the index reaches the end of a given dimension,
+     * it resets that dimension's index to zero and carries over the increment to the next more significant dimension.
      * 
      * @param indices A vector of indices to be incremented.
      * @param shape A vector representing the shape (dimensions) of the tensor.
