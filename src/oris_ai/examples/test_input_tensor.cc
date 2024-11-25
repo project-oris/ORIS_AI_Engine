@@ -47,43 +47,83 @@ float letterbox(cv::Mat& input_image, cv::Mat& output_image, const std::vector<i
   return resize_scale;
 }
 
+// sthong note
+// - ConvertMatToTensor()은 사용자 정으에 따라 변경 가능
+// - Method 1은 OpenCV를 활용하여 전처리하며, Method 2는 자체 Tensor 구조를 이용하여 정규화함
+// - 속도는 큰 차이 없으나, 아주 미세하게 Method 1이 빠름 (소수점 3자리 이하)
+// - 비교 대상(ex> LibTorch)에서 사용하는 전처리 알고리즘에 맞게 선택적으로 사용
 
-// 자체 텐서 생성 후 텐서를 정규화
+// // Method 1: 정규화 시 opencv의 내부 함수를 이용
+// // 수행시간: 0.06567 ms
+// oris_ai::Tensor<float> ConvertMatToTensor(const cv::Mat& input_image, bool rb_swap=false) {
+//   // Step 1: Perform BGR -> RGB conversion if necessary
+//   cv::Mat converted_image;
+//   if (rb_swap)
+//     cv::cvtColor(input_image, converted_image, cv::COLOR_BGR2RGB);
+//   else
+//     converted_image = input_image; // Use input_image as is
+
+//   // Step 2: Create a tensor (in NCHW format)
+//   std::vector<size_t> shape = {1, 3, static_cast<size_t>(converted_image.rows), static_cast<size_t>(converted_image.cols)};
+//   oris_ai::Tensor<float> input_tensor(shape);
+
+//   float* input_data = input_tensor.GetCPUDataPtr();
+
+//   // Step 3: Wrap the input data
+//   std::vector<cv::Mat> input_channels;
+//   input_channels.reserve(3);
+
+//   for (unsigned int j = 0; j < 3; ++j) {
+//     cv::Mat channel(static_cast<size_t>(converted_image.rows), static_cast<size_t>(converted_image.cols), CV_32FC1, input_data);
+//     input_channels.push_back(channel);
+//     input_data += static_cast<size_t>(converted_image.rows) * static_cast<size_t>(converted_image.cols);
+//   }
+
+//   // Step 4: Normalize and split channels
+//   cv::Mat float_image;
+//   converted_image.convertTo(float_image, CV_32FC3, 1.0f/255.0f); // Directly convert to float
+//   cv::split(float_image, input_channels); // Split channels from the normalized image
+
+//   return input_tensor;
+// }
+
+// Method 2: 자체 텐서 생성 후 텐서를 정규화
+// 수행시간: 0.068364 ms
 oris_ai::Tensor<float> ConvertMatToTensor(const cv::Mat& input_image, bool rb_swap=false) {
-  // Step 1: 필요한 경우 BGR -> RGB 변환 수행
+  // Step 1: Perform BGR -> RGB conversion if necessary
   cv::Mat converted_image;
   if (rb_swap)
     cv::cvtColor(input_image, converted_image, cv::COLOR_BGR2RGB);
   else
-    converted_image = input_image; // input_image 그대로 사용
+    converted_image = input_image; // Use input_image as is
 
-  // Step 2: 텐서 생성 (NCHW 형태)
+  // Step 2: Create a tensor (in NCHW format)
   const std::vector<size_t> shape = {1, 3, static_cast<size_t>(converted_image.rows), static_cast<size_t>(converted_image.cols)};
 
-  // Step 3: float 텐서를 직접 생성하여 데이터를 변환 및 정규화
+  // Step 3: Create a float tensor directly, converting and normalizing data
   oris_ai::Tensor<float> input_tensor(shape);
   float* tensor_data = input_tensor.GetCPUDataPtr();
   
-  // OpenCV Mat 데이터 포인터를 얻어오기
-  const uint8_t* input_data = converted_image.ptr<uint8_t>(); // 첫 번째 행의 포인터 얻기
+  // Get the data pointer of OpenCV Mat
+  const uint8_t* input_data = converted_image.ptr<uint8_t>(); // Get the pointer to the first row
 
-  // Step 4: 데이터 변환 및 정규화 (NHWC -> NCHW 변환)
+  // Step 4: Data conversion and normalization (convert NHWC to NCHW)
   const size_t height = shape[2];  // H
   const size_t width = shape[3];   // W
   const size_t channels = shape[1]; // C (RGB)
 
-  // 데이터 변환 및 정규화
-  const size_t hw_size = height * width;  // H * W를 미리 계산
-  const size_t total_pixels = hw_size;    // 전체 픽셀 수 (H * W)
+  // Data conversion and normalization
+  const size_t hw_size = height * width;  // Pre-calculate H * W
+  const size_t total_pixels = hw_size;    // Total number of pixels (H * W)
 
   for (size_t c = 0; c < channels; ++c) {
-    size_t channel_offset = c * total_pixels; // NCHW에서 채널별 오프셋
+    size_t channel_offset = c * total_pixels; // Offset per channel in NCHW
 
     for (size_t i = 0; i < total_pixels; ++i) {
-      size_t h = i / width; // 현재 높이 인덱스
-      size_t w = i % width; // 현재 너비 인덱스
+      size_t h = i / width; // Current height index
+      size_t w = i % width; // Current width index
 
-      size_t nhwc_index = h * width * channels + w * channels + c; // NHWC 인덱스 계산
+      size_t nhwc_index = h * width * channels + w * channels + c; // Calculate NHWC index
       tensor_data[channel_offset + i] = static_cast<float>(input_data[nhwc_index]) / 255.0f;
     }
   }
@@ -92,7 +132,7 @@ oris_ai::Tensor<float> ConvertMatToTensor(const cv::Mat& input_image, bool rb_sw
 }
 
 int main() {
-  // 예시 이미지 로드
+  // Load example image
   std::string image_path = "../../test_image/bus.jpg";
   cv::Mat image = cv::imread(image_path);
 
@@ -102,26 +142,44 @@ int main() {
   }
 
   cv::Mat converted_img;
-  cv::cvtColor(image, converted_img, cv::COLOR_BGR2RGB);  // BGR -> RGB
+  cv::cvtColor(image, converted_img, cv::COLOR_BGR2RGB);  // Convert BGR to RGB
 
   cv::Mat input_image;
   letterbox(converted_img, input_image, {640, 640});
 
   std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
 
-  // 이미지 데이터를 Tensor 객체로 변환
+  // Convert image data to Tensor object
   oris_ai::Tensor<float> input_tensor = ConvertMatToTensor(input_image);
+  // input_tensor.Permute({0, 3, 1, 2}); // Permute operation is already performed in ConvertMatToTensor
 
   std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
-  std::chrono::duration<double> micro_time = std::chrono::duration_cast<std::chrono::microseconds>(end-start);
+  std::chrono::duration<double> micro_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
   std::cout << "Preprocessing Time : " << micro_time.count() << " ms" << std::endl;
 
   std::cout << "Tensor shape: ";
-  const std::vector<size_t>& tensor_shape = input_tensor.Shape();
+  const std::vector<size_t>& tensor_shape = input_tensor.GetShape();
   for (size_t dim : tensor_shape) {
     std::cout << dim << " ";
   }
   std::cout << std::endl;
+
+  // Save tensor data to a txt file (for debugging purposes)
+  float* tensor_data = input_tensor.GetCPUDataPtr();
+  std::ofstream outfile("oris_input_tensor.txt");
+  if (outfile.is_open()) {
+    const std::vector<size_t>& shape = input_tensor.GetShape();  // Retrieve tensor shape
+    size_t total_elements = shape[0] * shape[1] * shape[2] * shape[3];  // N * C * H * W
+
+    for (size_t i = 0; i < total_elements; ++i) {
+      outfile << tensor_data[i] << "\n";
+    }
+
+    outfile.close();
+  } else {
+    fprintf(stderr, "Unable to open file for writing\n");
+    return -1;
+  }
 
   return 0;
 }
