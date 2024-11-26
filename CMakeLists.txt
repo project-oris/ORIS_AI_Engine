@@ -20,7 +20,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Lib 디렉토리 및 라이브러리 설정
 link_directories(${PROJECT_SOURCE_DIR}/lib)
-set(ORIS_LIB Oris_AI)
+set(ORIS_LIB ORIS_AI)
 
 # 필수 설치 패키지
 set(target_libraries "")

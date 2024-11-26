@@ -36,7 +36,7 @@ class LayerAbstract {
      * 
      * @param layer_name The name of the layer.
      */
-    LayerAbstract() {}
+    LayerAbstract(const std::string& name) : name_(name) {}
 
     /**
      * @brief Virtual destructor for the LayerAbstract class.
@@ -68,6 +68,13 @@ class LayerAbstract {
     inline unsigned int GetInputSize() { return input_tensors_.size(); }
 
     /**
+     * @brief Gets the name of the layer.
+     * 
+     * @return The name of the layer.
+     */
+    inline const std::string& GetLayerName() const { return name_; }
+
+    /**
      * @brief Gets the output tensor.
      * 
      * @return A pointer to the output tensor.
@@ -79,8 +86,23 @@ class LayerAbstract {
      */
     virtual void Forward() = 0;
 
+    /**
+     * @brief Prints input tensor (for debug).
+     */
+    void PrintInput(unsigned int index = 0);
+
+    /**
+     * @brief Prints output tensor (for debug).
+     */
+    void PrintOutput();
+
+    /**
+     * @brief Prints weight tensor (for debug).
+     */
+    virtual void PrintWeight() = 0;
+
   protected:
-    std::string layer_name_;                    /** The name of the layer */
+    std::string name_;                    /** The name of the layer */
     std::vector<Tensor<T>*> input_tensors_;     /** A vector of pointers to the input tensors */
     std::unique_ptr<Tensor<T>> output_tensor_;  /** A unique pointer to the output tensor */
 };
