@@ -90,6 +90,11 @@ namespace oris_ai {
        */
       inline const std::vector<size_t>& GetShape() const { return shape_; }
 
+      /** 
+       * @brief Returns the total count of the tensor.
+       */
+      inline const size_t GetTotalCount() const { return total_count_; }
+
       /**
        * @brief Permute the dimensions of the tensor.
        * 
