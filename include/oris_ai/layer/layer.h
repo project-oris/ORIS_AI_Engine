@@ -9,18 +9,18 @@
 
 namespace oris_ai {
 
-  /**
-   * @enum LayerType
-   * @brief Defines types of layers that can be used in the neural network.
-   */
-  enum class LayerType {
-    CONV,
-    // BATCHNORM,
-    ACTIVATION,
-    MAXPOOL,
-    CONCAT,
-    UPSAMPLE   
-  };
+/**
+ * @enum LayerType
+ * @brief Defines types of layers that can be used in the neural network.
+ */
+enum class LayerType {
+  CONV,
+  // BATCHNORM,
+  ACTIVATION,
+  MAXPOOL,
+  CONCAT,
+  UPSAMPLE   
+};
 
 /**
  * @class LayerAbstract
@@ -86,6 +86,7 @@ class LayerAbstract {
      */
     virtual void Forward() = 0;
 
+#ifdef USE_DEBUG_MODE
     /**
      * @brief Prints input tensor (for debug).
      */
@@ -99,7 +100,8 @@ class LayerAbstract {
     /**
      * @brief Prints weight tensor (for debug).
      */
-    virtual void PrintWeight() = 0;
+    virtual void PrintWeight() {}
+#endif
 
   protected:
     std::string name_;                    /** The name of the layer */
