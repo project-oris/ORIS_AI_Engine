@@ -36,7 +36,7 @@ class LayerAbstract {
      * 
      * @param layer_name The name of the layer.
      */
-    LayerAbstract(const std::string& name) : name_(name) {}
+    LayerAbstract(const std::string& layer_name) : layer_name_(layer_name) {}
 
     /**
      * @brief Virtual destructor for the LayerAbstract class.
@@ -72,7 +72,7 @@ class LayerAbstract {
      * 
      * @return The name of the layer.
      */
-    inline const std::string& GetLayerName() const { return name_; }
+    inline const std::string& GetLayerName() const { return layer_name_; }
 
     /**
      * @brief Gets the output tensor.
@@ -104,9 +104,9 @@ class LayerAbstract {
 #endif
 
   protected:
-    std::string name_;                    /** The name of the layer */
-    std::vector<Tensor<T>*> input_tensors_;     /** A vector of pointers to the input tensors */
-    std::unique_ptr<Tensor<T>> output_tensor_;  /** A unique pointer to the output tensor */
+    std::string layer_name_;                    // The name of the layer
+    std::vector<Tensor<T>*> input_tensors_;     // A vector of pointers to the input tensors
+    std::unique_ptr<Tensor<T>> output_tensor_;  // A unique pointer to the output tensor
 };
 
 } // namespace oris_ai
