@@ -23,18 +23,23 @@ template <typename T>
 class ConvolutionCPU : public Convolution<T> {
   public:
     /**
-     * @brief Constructor to initialize a ConvolutionCPU layer.
+     * @brief Constructor to initialize a ConvolutionCPU layer without layer_name.
+     */
+    ConvolutionCPU() : Convolution<T>() {}
+
+    /**
+     * @brief Constructor to initialize a ConvolutionCPU layer with layer_name.
      * @param name The name of the layer.
      */
-    ConvolutionCPU(const std::string& name) : Convolution<T>(name) {}
+    ConvolutionCPU(const std::string& layer_name) : Convolution<T>(layer_name) {}
 
     /**
      * @brief Destructor for the ConvolutionCPU class.
      */
-    ~ConvolutionCPU() {}
+    ~ConvolutionCPU() = default;
 
     /**
-     * @brief Performs the forward pass of the convolution layer using CPU resources.
+     * @brief Performs the forward pass of the Convolution layer using CPU resources.
      * 
      * This function overrides the pure virtual `Forward` method from the base `Convolution` 
      * class, providing a CPU-specific implementation for the convolution operation.

@@ -21,10 +21,15 @@ template <typename T>
 class UpsampleCPU : public Upsample<T> {
   public:
     /**
-     * @brief Constructor to initialize the UpsampleCPU layer.
+     * @brief Constructor to initialize a MaxPoolingCPU layer without layer_name.
+     */
+    UpsampleCPU() : Upsample<T>() {}
+
+    /**
+     * @brief Constructor to initialize the UpsampleCPU layer with layer_name.
      * @param name The name of the layer.
      */
-    UpsampleCPU(const std::string& name) : Upsample<T>(name) {}
+    UpsampleCPU(const std::string& layer_name) : Upsample<T>(layer_name) {}
 
     /**
      * @brief Destructor for the UpsampleCPU class.

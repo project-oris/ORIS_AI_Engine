@@ -8,6 +8,12 @@
 
 namespace oris_ai {
 
+// Define the UpsampleMode enum class
+enum class UpsampleMode {
+  NEAREST,
+  BILINEAR
+};
+
 /**
  * @class Upsample
  * @brief Represents an upsampling layer in a neural network.
@@ -17,26 +23,30 @@ namespace oris_ai {
  * @tparam T The data type for the layer operations (e.g., float).
  */
 template <typename T>
-class Upsample : public LayerAbstract<T> {
+class Upsample : public HiddenLayerAbstract<T> {
   public:
     /**
-     * @brief Constructor to initialize an upsampling layer.
-     * @param name The name of the layer.
+     * @brief Constructor to initialize a upsampling layer without layer_name.
      */
-    Upsample(const std::string& layer_name) : LayerAbstract<T>(layer_name), scale_factor_(2.0), mode_("nearest") {}
+    Upsample() : HiddenLayerAbstract<T>(), scale_factor_(2.0), mode_(UpsampleMode::NEAREST) {}
 
     /**
-     * @brief Virtual destructor for the Upsample class.
+     * @brief Constructor to initialize an upsampling layer with layer_name.
+     * @param name The name of the layer.
      */
-    virtual ~Upsample() {}
+    Upsample(const std::string& layer_name) : HiddenLayerAbstract<T>(layer_name), scale_factor_(2.0), mode_(UpsampleMode::NEAREST) {}
+
+    /**
+     * @brief Destructor for the Upsample class.
+     */
+    ~Upsample() = default;
 
     /**
      * @brief Initializes the upsampling layer with parameters from a TorchUpsample object.
      * 
      * @param upsample The TorchUpsample object.
-     * @param target_device The device on which to perform the upsampling (e.g., CPU, GPU).
      */
-    void InitUpsample(const TorchUpsample& upsample, Device target_device);
+    void InitUpsample(const TorchUpsample& upsample);
 
     /**
      * @brief Pure virtual function to perform the forward pass of the upsampling layer.
@@ -48,7 +58,8 @@ class Upsample : public LayerAbstract<T> {
 
   protected:
     float scale_factor_; // The scaling factor for upsampling
-    std::string mode_;   // Upsample mode (e.g., "nearest", "bilinear")
+    // std::string mode_;   // Upsample mode (e.g., "nearest", "bilinear")
+    UpsampleMode mode_;  // Upsample mode (e.g., "nearest", "bilinear")
     size_t output_height_, output_width_; // Output dimensions after the upsampling operation
 };
 

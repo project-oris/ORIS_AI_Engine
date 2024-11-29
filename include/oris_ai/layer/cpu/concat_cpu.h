@@ -20,18 +20,27 @@ template <typename T>
 class ConcatCPU : public Concat<T> {
   public:
     /**
-     * @brief Constructor to initialize a ConcatCPU layer.
+     * @brief Constructor to initialize a ConcatCPU layer without layer_name.
      * @param name The name of the layer.
      */
-    ConcatCPU(const std::string& name) : Concat<T>(name) {}
+    ConcatCPU() : Concat<T>() {}
+
+    /**
+     * @brief Constructor to initialize a ConcatCPU layer with layer_name.
+     * @param name The name of the layer.
+     */
+    ConcatCPU(const std::string& layer_name) : Concat<T>(layer_name) {}
 
     /**
      * @brief Virtual destructor for the ConcatCPU class.
      */
-    virtual ~ConcatCPU() {}
+    ~ConcatCPU() = default;
 
     /**
-     * @brief Implements the forward pass for the concatenation layer.
+     * @brief Performs the forward pass of the Concat layer using CPU resources.
+     * 
+     * This function overrides the pure virtual `Forward` method from the base `Concat` 
+     * class, providing a CPU-specific implementation for the Concat operation.
      */
     void Forward() override;
 };

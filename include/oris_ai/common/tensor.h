@@ -5,6 +5,7 @@
 #pragma once
 
 #include <cstddef>  // for size_t
+#include <memory>
 #include <vector>
 
 namespace oris_ai {
@@ -47,6 +48,13 @@ class Tensor {
      * @return T* Pointer to the data in CPU memory.
      */
     T* GetCPUDataPtr();
+
+    /**
+     * @brief Retrieves a constant pointer to the data stored in CPU memory, copying from GPU if necessary.
+     * 
+     * @return const T* A constant pointer to the data in CPU memory.
+     */
+    const T* GetCPUDataPtr() const;
 
     /**
      * @brief Retrieves a pointer to the data stored in GPU memory, copying from CPU if necessary.
@@ -96,11 +104,45 @@ class Tensor {
     inline const size_t GetTotalCount() const { return total_count_; }
 
     /**
+     * @brief Adds the values of another Tensor to this Tensor.
+     * 
+     * This method adds the values of the input tensor to the current tensor.
+     * Both tensors must have the same shape.
+     * 
+     * @param other The other tensor whose values will be added to this tensor.
+     */
+    void Add(const Tensor<T>& other);
+
+    // /**
+    //  * @brief Concatenates a list of tensors along the specified dimension.
+    //  * 
+    //  * This function takes a list of input tensors and concatenates them along a specified dimension
+    //  * (e.g., channel dimension). All tensors must have the same shape except for the concatenation
+    //  * dimension.
+    //  *
+    //  * @param tensors The list of input tensors to concatenate.
+    //  * @param concat_dim The dimension along which the tensors will be concatenated.
+    //  */
+    // void Concat(const std::vector<const Tensor<T>*>& tensors, size_t concat_dim);
+
+    /**
      * @brief Permute the dimensions of the tensor.
      * 
      * @param dims A vector specifying the new order of dimensions.
      */
     void Permute(const std::vector<size_t>& dims);
+
+    /**
+     * @brief Splits the current tensor into multiple smaller tensors along the specified dimension.
+     * 
+     * This function splits the current tensor into a set of smaller tensors based on the specified 
+     * dimension. The resulting tensors will have the same shape as the original tensor, except for 
+     * the split dimension, where the size will be divided accordingly.
+     *
+     * @param split_tensors A vector to hold the resulting split tensors.
+     * @param split_dim The dimension along which the tensor will be split.
+     */
+    void Split(std::vector<Tensor<T>*>& split_tensors, size_t split_dim);
 
   private:
     std::vector<size_t> shape_;     /** Stores the shape (dimensions) of the tensor */
@@ -161,6 +203,8 @@ class Tensor {
      *         Returns false if the end of all dimensions has been reached.
      */
     bool IncrementIndices(std::vector<size_t>& indices, const std::vector<size_t>& shape) const;
+
+    size_t GetDimensionStride(size_t dim) const;
 };
 
 } // namespace oris_ai
