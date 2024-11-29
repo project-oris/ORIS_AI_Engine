@@ -4,7 +4,7 @@
 ******************************************************************************/
 #pragma once
 
-#include "oris_ai/common/cuda_define.h"
+#include "oris_ai/accelerator/cuda/cuda_define.h"
 
 namespace oris_ai {
 

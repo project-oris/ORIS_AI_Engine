@@ -18,26 +18,31 @@ namespace oris_ai {
  * @tparam T The data type for the layer operations (e.g., float).
  */
 template <typename T>
-class MaxPooling : public LayerAbstract<T> {
+class MaxPooling : public HiddenLayerAbstract<T> {
   public:
     /**
-     * @brief Constructor to initialize a max pooling layer.
+     * @brief Constructor to initialize a max pooling layer without layer_name.
      * @param name The name of the layer.
      */
-    MaxPooling(const std::string& layer_name) : LayerAbstract<T>(layer_name) {}
+    MaxPooling() : HiddenLayerAbstract<T>() {}
 
     /**
-     * @brief Virtual destructor for the MaxPooling class.
+     * @brief Constructor to initialize a max pooling layer with layer_name.
+     * @param name The name of the layer.
      */
-    virtual ~MaxPooling() {}
+    MaxPooling(const std::string& layer_name) : HiddenLayerAbstract<T>(layer_name) {}
+
+    /**
+     * @brief Destructor for the MaxPooling class.
+     */
+    ~MaxPooling() = default;
 
     /**
      * @brief Initializes the pooling layer with parameters from a TorchMaxPool2d object.
      * 
      * @param maxpool2d_params The TorchMaxPool2d object containing max pooling parameters.
-     * @param target_device The device on which to perform the max pooling (e.g., CPU or GPU).
      */
-    void InitMaxPooling(const TorchMaxPool2d& maxpool2d_params, Device target_device);
+    void InitMaxPooling(const TorchMaxPool2d& maxpool2d_params);
 
     /**
      * @brief Pure virtual function to perform the forward pass of the max pooling layer.

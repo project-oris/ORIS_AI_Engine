@@ -18,39 +18,43 @@ namespace oris_ai {
  * @tparam T The data type for the layer operations (e.g., float).
  */
 template <typename T>
-class Convolution : public LayerAbstract<T> {
+class Convolution : public HiddenLayerAbstract<T> {
   public:
     /**
-     * @brief Constructor to initialize a Convolution layer with no activation.
+     * @brief Constructor to initialize a Convolution layer without layer_name.
+     */
+    Convolution()
+      : HiddenLayerAbstract<T>(),
+        activation_type_(ActivationType::NONE), 
+        is_1x1_conv_(false) {}
+        
+    /**
+     * @brief Constructor to initialize a Convolution layer with layer_name.
      * @param name The name of the layer.
      */
     Convolution(const std::string& layer_name) 
-      : LayerAbstract<T>(layer_name), 
+      : HiddenLayerAbstract<T>(layer_name), 
         activation_type_(ActivationType::NONE), 
         is_1x1_conv_(false) {}
 
     /**
-     * @brief Virtual destructor for the Convolution class.
+     * @brief Destructor for the Convolution class.
      */
-    virtual ~Convolution() {}
+    ~Convolution() = default;
 
     /**
      * @brief Initializes the convolution layer with parameters from a TorchConv2d object.
      * 
-     * This function sets up the convolutional layer by configuring the weight tensor, bias (if applicable),
-     * kernel size, stride, padding, and output dimensions. It prepares the layer for execution
-     * on the specified device (CPU or GPU) based on the provided parameters.
+     * This function sets up the convolutional layer by configuring the weight tensor, bias (if applicable), kernel size, stride, padding, and output dimensions.
      * 
      * @param conv2d_params The TorchConv2d object containing convolution parameters.
-     * @param target_device The device on which to perform the convolution (e.g., CPU, GPU).
      */
-    void InitConvolution(const TorchConv2d& conv2d_params, Device target_device);
+    void InitConvolution(const TorchConv2d& conv2d_params);
 
     /**
      * @brief Sets the activation function for the convolution layer.
      * 
-     * This function defines the activation function to be applied after the convolution operation.
-     * It sets the activation type (e.g., ReLU, SiLU) and related parameters for the layer.
+     * This function defines the activation function to be applied after the convolution operation.It sets the activation type (e.g., ReLU, SiLU) and related parameters for the layer.
      * 
      * @param act The TorchActivation object containing the activation type and its parameters.
      */

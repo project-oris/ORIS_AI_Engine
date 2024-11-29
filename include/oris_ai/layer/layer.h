@@ -10,19 +10,6 @@
 namespace oris_ai {
 
 /**
- * @enum LayerType
- * @brief Defines types of layers that can be used in the neural network.
- */
-enum class LayerType {
-  CONV,
-  // BATCHNORM,
-  ACTIVATION,
-  MAXPOOL,
-  CONCAT,
-  UPSAMPLE   
-};
-
-/**
  * @class LayerAbstract
  * @brief Represents a neural network layer with a specified name.
  * 
@@ -32,7 +19,12 @@ template <typename T>
 class LayerAbstract {
   public:
     /**
-     * @brief Constructor to create a Layer object with a given name.
+     * @brief Constructor to create a Layer object without layer_name.
+     */
+    LayerAbstract() : layer_name_("") {}
+
+    /**
+     * @brief Constructor to create a Layer object with a given layer_name.
      * 
      * @param layer_name The name of the layer.
      */
@@ -41,14 +33,7 @@ class LayerAbstract {
     /**
      * @brief Virtual destructor for the LayerAbstract class.
      */
-    virtual ~LayerAbstract() {}
-
-    /**
-     * @brief Sets the input tensor for the layer.
-     * 
-     * @param input_tensor A pointer to the input tensor.
-     */
-    void SetInputTensor(Tensor<T>* input_tensor);
+    virtual ~LayerAbstract() = default;
 
     /**
      * @brief Gets the input tensor at a specified index.
@@ -56,16 +41,27 @@ class LayerAbstract {
      * @param input_idx The index of the input tensor to retrieve. Default is 0.
      * @return A pointer to the input tensor at the specified index.
      */
-    inline Tensor<T>* GetInputTensor(unsigned int input_idx = 0) {
+    inline Tensor<T>* GetInputTensor(size_t input_idx = 0) {
       return input_tensors_.at(input_idx);
     }
+
+    /**
+     * @brief Sets the input tensor for the layer.
+     * 
+     * This is a virtual function that can be overridden by derived classes
+     * to set the input tensor for the layer. The input tensor is typically used
+     * as the data for forward propagation in the layer.
+     * 
+     * @param input_tensor A pointer to the input tensor.
+     */
+    virtual void SetInputTensor(Tensor<T>* input_tensor);
 
     /**
      * @brief Gets the number of input tensors.
      * 
      * @return The number of input tensors.
      */
-    inline unsigned int GetInputSize() { return input_tensors_.size(); }
+    virtual inline size_t GetInputSize() { return input_tensors_.size(); }
 
     /**
      * @brief Gets the name of the layer.
@@ -74,12 +70,7 @@ class LayerAbstract {
      */
     inline const std::string& GetLayerName() const { return layer_name_; }
 
-    /**
-     * @brief Gets the output tensor.
-     * 
-     * @return A pointer to the output tensor.
-     */
-    inline Tensor<T>* GetOutputTensor() { return output_tensor_.get(); }
+    inline void SetLayerName(const std::string& layer_name) { layer_name_ = layer_name; }
 
     /**
      * @brief Pure virtual function to perform the forward pass of the layer.
@@ -90,22 +81,62 @@ class LayerAbstract {
     /**
      * @brief Prints input tensor (for debug).
      */
-    void PrintInput(unsigned int index = 0);
-
-    /**
-     * @brief Prints output tensor (for debug).
-     */
-    void PrintOutput();
-
-    /**
-     * @brief Prints weight tensor (for debug).
-     */
-    virtual void PrintWeight() {}
+    void PrintInput(size_t index = 0);
 #endif
 
   protected:
     std::string layer_name_;                    // The name of the layer
     std::vector<Tensor<T>*> input_tensors_;     // A vector of pointers to the input tensors
+};
+
+/**
+ * @class HiddenLayerAbstract
+ * @brief Represents a hidden layer with input and output tensors.
+ * 
+ * This class adds output tensor management to the base LayerAbstract class.
+ * 
+ * @tparam T The data type for the layer operations (e.g., float).
+ */
+template <typename T>
+class HiddenLayerAbstract : public LayerAbstract<T> {
+  public:
+    /**
+     * @brief Constructor to create a HiddenLayerAbstract object without layer_name.
+     */
+    HiddenLayerAbstract() : LayerAbstract<T>() {}
+
+    /**
+     * @brief Constructor to create a HiddenLayerAbstract object with layer_name.
+     */
+    HiddenLayerAbstract(const std::string& layer_name) : LayerAbstract<T>(layer_name) {}
+
+    /**
+     * @brief Virtual destructor for the HiddenLayerAbstract class.
+     */
+    virtual ~HiddenLayerAbstract() = default;
+
+    /**
+     * @brief Gets the output tensor.
+     * 
+     * Retrieves the output tensor produced by the layer after forward propagation.
+     * 
+     * @return A pointer to the output tensor.
+     */
+    virtual inline Tensor<T>* GetOutputTensor() { return output_tensor_.get(); }
+
+#ifdef USE_DEBUG_MODE
+    /**
+     * @brief Prints weight tensor (for debug).
+     */
+    virtual void PrintWeight() {}
+
+    /**
+     * @brief Prints output tensor (for debug).
+     */
+    virtual void PrintOutput();
+#endif
+
+  protected:
     std::unique_ptr<Tensor<T>> output_tensor_;  // A unique pointer to the output tensor
 };
 
