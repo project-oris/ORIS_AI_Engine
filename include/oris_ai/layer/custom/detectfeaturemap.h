@@ -14,7 +14,7 @@ namespace oris_ai {
  * @brief Represents a custom DetectFeatureMap layer in the YOLO model.
  * 
  * This class wraps a Convolution layer and manages initialization and forward pass operations
- * for the custom Detect layer in YOLO models.
+ * for the Yolov8Detect layer in YOLO models.
  */
 template <typename T>
 class DetectFeatureMap : public HiddenLayerAbstract<T> {
@@ -38,23 +38,10 @@ class DetectFeatureMap : public HiddenLayerAbstract<T> {
     void InitDetectFeatureMap(const std::vector<TorchLayer>& detect_layers);
 
     /**
-     * @brief Sets the input tensor for the DetectFeatureMap layer.
-     * @param input_tensor The input tensor.
-     */
-    void SetInputTensor(Tensor<T>* input_tensor) override;
-
-    /**
-     * @brief Gets the number of input tensors.
-     * 
-     * @return The number of input tensors.
-     */
-    inline size_t GetInputSize() override { return cv2_0_->GetInputSize(); }
-
-    /**
      * @brief Retrieves the output tensor for the DetectFeatureMap layer.
      * @return The output tensor.
      */
-    Tensor<T>* GetOutputTensor() override;
+    inline Tensor<T>* GetOutputTensor() override { return cv2_cv3_concat_->GetOutputTensor(); }
 
     /**
      * @brief Perform the forward pass for the Conv layer.

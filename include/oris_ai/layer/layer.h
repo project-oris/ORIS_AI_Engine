@@ -82,6 +82,8 @@ class LayerAbstract {
      * @brief Prints input tensor (for debug).
      */
     void PrintInput(size_t index = 0);
+
+    void PrintTensor(const Tensor<T>* tensor, const std::string& tensor_name);
 #endif
 
   protected:

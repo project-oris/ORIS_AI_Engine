@@ -4,8 +4,8 @@
 ******************************************************************************/
 #pragma once
 
-#include "oris_ai/model/model.h"
 #include "oris_ai/layer/layer_factory.h"
+#include "oris_ai/model/model.h"
 
 namespace oris_ai {
 
@@ -37,6 +37,12 @@ class Yolov8 : public Model {
      */
     void Forward();
 
+    void NonMaxSuppression(float score_threshold = 0.25f, float iou_threshold = 0.45f, int max_det = 300);
+
+    inline const std::vector<Detection>& GetResult() const override {
+      return model_22_detect_->GetDetectionResult();
+    }
+
   private:
     bool ParsingModel(std::fstream& input);
     void SetC2fLayers(const oris_ai::TorchModel& model, std::vector<TorchLayer>& torch_layers, int& index, int bottleneck_count);
@@ -66,9 +72,10 @@ class Yolov8 : public Model {
     std::unique_ptr<Concat<float>> model_20_concat_;
     std::unique_ptr<C2f<float>> model_21_c2f_;
 
-    std::unique_ptr<DetectFeatureMap<float>> model_22_detect_1_;
-    std::unique_ptr<DetectFeatureMap<float>> model_23_detect_2_;
-    std::unique_ptr<DetectFeatureMap<float>> model_24_detect_3_;
+    std::unique_ptr<Yolov8Detect<float>> model_22_detect_;
+    // std::unique_ptr<DetectFeatureMap<float>> model_22_detect_1_;
+    // std::unique_ptr<DetectFeatureMap<float>> model_23_detect_2_;
+    // std::unique_ptr<DetectFeatureMap<float>> model_24_detect_3_;
 };
 
 }  // namespace oris_ai

@@ -11,7 +11,8 @@
 
 #include "oris_ai/layer/custom/c2f.h"
 #include "oris_ai/layer/custom/sppf.h"
-#include "oris_ai/layer/custom/detectfeaturemap.h"
+#include "oris_ai/layer/custom/yolov8_detect.h"
+// #include "oris_ai/layer/custom/detectfeaturemap.h"
 
 namespace oris_ai {
 
@@ -81,7 +82,10 @@ std::unique_ptr<SPPF<T>> CreateSPPF(const std::string& layer_name, Device target
  * @param target_device The device (CPU or GPU) on which the layer will operate.
  * @return A unique pointer to the newly created DetectFeatureMa layer.
  */
+// template <typename T>
+// std::unique_ptr<DetectFeatureMap<T>> CreateDetectFeatureMap(const std::string& layer_name, Device target_device);
+
 template <typename T>
-std::unique_ptr<DetectFeatureMap<T>> CreateDetectFeatureMap(const std::string& layer_name, Device target_device);
+std::unique_ptr<Yolov8Detect<T>> CreateYolov8Detect(const std::string& layer_name, Device target_device);
 
 } // namespace oris_ai
