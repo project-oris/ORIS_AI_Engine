@@ -5,8 +5,7 @@
 #pragma once
 
 #include "oris_ai/layer/layer.h"
-
-#include <opencv2/opencv.hpp>
+#include "oris_ai/model/yolov8/yolov8_type.h"
 
 namespace oris_ai {
 
@@ -55,6 +54,11 @@ class Model {
      * the forward pass of the model.
      */
     virtual void Forward() = 0;
+
+    virtual void NonMaxSuppression(float score_threshold = 0.25f, float iou_threshold = 0.45f, int max_det = 300) = 0;
+
+    // Pure virtual function for GetResult
+    virtual inline const std::vector<Detection>& GetResult() const = 0;
 
   protected:
     void CreateDummyInputTensor();

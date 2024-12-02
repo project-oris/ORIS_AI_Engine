@@ -38,23 +38,10 @@ class C2f : public HiddenLayerAbstract<T> {
     void InitC2f(const std::vector<TorchLayer>& c2f_layers);
 
     /**
-     * @brief Sets the input tensor for the C2f layer.
-     * @param input_tensor The input tensor.
+     * @brief Retrieves the output tensor from the last convolutional layer in the C2f layer.
+     * @return The output tensor from the last convolutional layer.
      */
-    void SetInputTensor(Tensor<T>* input_tensor) override;
-
-    /**
-     * @brief Gets the number of input tensors.
-     * 
-     * @return The number of input tensors.
-     */
-    inline size_t GetInputSize() override { return c2f_cv1_->GetInputSize(); }
-
-    /**
-     * @brief Retrieves the output tensor for the C2f layer.
-     * @return The output tensor.
-     */
-    Tensor<T>* GetOutputTensor() override;
+    inline Tensor<T>* GetOutputTensor() override { return c2f_cv2_->GetOutputTensor(); }
 
     /**
      * @brief Perform the forward pass for the C2f layer.
@@ -74,9 +61,9 @@ class C2f : public HiddenLayerAbstract<T> {
     bool shortcut_;  // Indicates if shortcut (add) operation is enabled
     int bottleneck_count_;  // Number of bottleneck layers
 
-    std::vector<Tensor<T>*> split_tensors_;  // Tensors created by splitting cv1 output
-    // std::vector<const Tensor<T>*> tensors_to_concat_;  // Tensors to concatenate before cv2
-    // Tensor<T>* concat_tensor_;  // Concatenated tensor after bottlenecks
+    std::vector<size_t> split_sizes_;  // Stores fixed split sizes for the feature maps
+    Tensor<T>* c2f_cv1_split_0_;
+    Tensor<T>* c2f_cv1_split_1_;
 };
 
 } // namespace oris_ai

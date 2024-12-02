@@ -47,23 +47,10 @@ class Bottleneck : public HiddenLayerAbstract<T> {
     const std::vector<TorchLayer> c2f_layers;
 
     /**
-     * @brief Sets the input tensor for the first convolutional layer in the bottleneck.
-     * @param input_tensor The input tensor.
-     */
-    void SetInputTensor(Tensor<T>* input_tensor) override;
-
-    /**
-     * @brief Gets the number of input tensors.
-     * 
-     * @return The number of input tensors.
-     */
-    inline size_t GetInputSize() override { return bottleneck_cv1_->GetInputSize(); }
-
-    /**
      * @brief Retrieves the output tensor from the second convolutional layer in the bottleneck.
      * @return The output tensor from the second convolutional layer.
      */
-    Tensor<T>* GetOutputTensor() override;
+    inline Tensor<T>* GetOutputTensor() override { return bottleneck_cv2_->GetOutputTensor(); }
 
     /**
      * @brief Perform the forward pass of the Bottleneck layer.
@@ -75,18 +62,5 @@ class Bottleneck : public HiddenLayerAbstract<T> {
     std::unique_ptr<Convolution<T>> bottleneck_cv2_;  // Second convolutional layer in bottleneck
     bool add_;  // Flag to determine if element-wise addition is performed
 };
-
-/**
- * @brief Factory function to create a Bottleneck layer.
- * 
- * This function dynamically creates a Bottleneck layer based on target device.
- * 
- * @tparam T The data type used by the Bottleneck layer (e.g., float).
- * @param layer_name The name of the Bottleneck layer.
- * @param target_device The device (CPU or GPU) on which the Bottleneck layer will operate.
- * @param add Flag to determine if element-wise addition is performed.
- */
-template <typename T>
-std::unique_ptr<Bottleneck<T>> CreateBottleneck(const std::string& layer_name, Device target_device, bool add);
 
 } // namespace oris_ai

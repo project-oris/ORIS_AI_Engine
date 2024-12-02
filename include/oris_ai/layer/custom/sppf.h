@@ -36,23 +36,10 @@ class SPPF : public HiddenLayerAbstract<T> {
     void InitSPPF(const std::vector<TorchLayer>& sppf_layers);
 
     /**
-     * @brief Sets the input tensor for the SPPF layer.
-     * @param input_tensor The input tensor.
-     */
-    void SetInputTensor(Tensor<T>* input_tensor) override;
-
-    /**
-     * @brief Gets the number of input tensors.
-     * 
-     * @return The number of input tensors.
-     */
-    inline size_t GetInputSize() override { return sppf_cv1_->GetInputSize(); }
-
-    /**
-     * @brief Retrieves the output tensor for the SPPF layer.
+     * @brief Retrieves the output tensor from the last convolutional layer in the SPPF layer.
      * @return The output tensor.
      */
-    Tensor<T>* GetOutputTensor() override;
+    inline Tensor<T>* GetOutputTensor() override { return sppf_cv2_->GetOutputTensor(); }
 
     /**
      * @brief Perform the forward pass for the SPPF layer.
@@ -70,9 +57,6 @@ class SPPF : public HiddenLayerAbstract<T> {
     std::unique_ptr<MaxPooling<T>> sppf_maxpool3_;  // Third max-pooling layer
     std::unique_ptr<Concat<T>> sppf_concat_;    // Layer to concatenate before cv2
     std::unique_ptr<Convolution<T>> sppf_cv2_;  // Second convolution layer (cv2)
-
-    // std::vector<const Tensor<T>*> tensors_to_concat_;  // Tensors to concatenate
-    // Tensor<T>* concat_tensor_;  // Concatenated tensor
 };
 
 }  // namespace oris_ai

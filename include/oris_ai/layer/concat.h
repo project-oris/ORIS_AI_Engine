@@ -13,7 +13,8 @@ namespace oris_ai {
  * @brief Represents a concatenation layer in a neural network.
  * 
  * This class defines a concatenation layer, which concatenates multiple input tensors 
- * along a specified dimension.
+ * along a specified dimension. The Concat class can optionally apply a Permute operation 
+ * to adjust the shape of each input tensor before concatenation.
  * 
  * @tparam T The data type for the layer operations (e.g., float).
  */
@@ -23,17 +24,19 @@ class Concat : public HiddenLayerAbstract<T> {
     /**
      * @brief Constructor to initialize a concatenation layer without layer_name.
      */
-    Concat() : HiddenLayerAbstract<T>(), concat_dim_(1) {}
+    Concat() : HiddenLayerAbstract<T>(), concat_dim_(1), use_view_input_(false) {}
 
     /**
      * @brief Constructor to initialize a concatenation layer.
      * @param name The name of the layer.
      */
-    Concat(const std::string& layer_name) : HiddenLayerAbstract<T>(layer_name), concat_dim_(1) {}
+    Concat(const std::string& layer_name) 
+      : HiddenLayerAbstract<T>(layer_name), concat_dim_(1), use_view_input_(false) {}
 
     /**
      * @brief Destructor for the Concat class.
      */
+    // ~Concat();
     ~Concat() = default;
 
     /**
@@ -57,6 +60,15 @@ class Concat : public HiddenLayerAbstract<T> {
      */
     virtual void Forward() = 0;
 
+    /**
+     * @brief Enables the use of the view input mode for the Concat layer.
+     * 
+     * This function sets the internal flag to indicate that the view input mode should be
+     * used. When enabled, operations in the Concat layer may utilize a view of the input
+     * tensor rather than directly accessing or modifying the original data.
+     */
+    inline void SetUseViewInput() { use_view_input_ = true; }
+
   protected:
     /**
      * @brief Configures and initializes the output tensor for the concat layer.
@@ -67,6 +79,8 @@ class Concat : public HiddenLayerAbstract<T> {
 
     size_t concat_dim_; // The dimension along which concatenation occurs
     std::vector<size_t> output_shape_; // Shape of the output tensor after concatenation
+
+    bool use_view_input_; // Flag indicating whether to use view input mode for tensor operations
 };
 
 } // namespace oris_ai
