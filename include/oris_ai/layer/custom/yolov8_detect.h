@@ -5,7 +5,7 @@
 #pragma once
 
 #include "oris_ai/layer/concat.h"
-#include "oris_ai/layer/permute.h"
+#include "oris_ai/layer/split.h"
 #include "oris_ai/layer/custom/detectfeaturemap.h"
 #include "oris_ai/layer/custom/dfl.h"
 #include "oris_ai/layer/custom/decode_bboxes.h"
@@ -30,9 +30,9 @@ class Yolov8Detect : public LayerAbstract<T> {
     Yolov8Detect(const std::string& layer_name, Device target_device);
 
     /**
-     * @brief Destructor for the Yolov8Detect class.
+     * @brief Default destructor for the Yolov8Detect class.
      */
-    ~Yolov8Detect();
+    ~Yolov8Detect() = default;
 
     /**
      * @brief Initializes the Yolov8Detect layer.
@@ -62,16 +62,15 @@ class Yolov8Detect : public LayerAbstract<T> {
     std::unique_ptr<DetectFeatureMap<T>> detect_feature_map_1_;
     std::unique_ptr<DetectFeatureMap<T>> detect_feature_map_2_;
     std::unique_ptr<Concat<T>> feature_map_concat_;
+    std::unique_ptr<Split<T>> feature_map_concat_to_box_cls_;
     std::unique_ptr<DFL<T>> dfl_;
     std::unique_ptr<DecodeBboxes<T>> decode_bboxes_;  // get dbox
-
-    size_t no_;
 
     // Anchor points and stride tensors as 2D Tensors
     std::unique_ptr<Tensor<T>> anchor_points_;  // Tensor for anchor points
     std::unique_ptr<Tensor<T>> strides_;  // Tensor for stride values
     
-    std::vector<size_t> box_cls_split_sizes_; // Size to split box and cls tensors
+    // std::vector<size_t> box_cls_split_sizes_; // Size to split box and cls tensors
     Tensor<T>* box_;
     Tensor<T>* cls_;
 

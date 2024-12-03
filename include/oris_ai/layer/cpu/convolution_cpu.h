@@ -39,6 +39,17 @@ class ConvolutionCPU : public Convolution<T> {
     ~ConvolutionCPU() = default;
 
     /**
+     * @brief Overrides the virtual InitConvolution function for CPU-specific initialization.
+     * 
+     * This function implements the virtual InitConvolution method defined in the Convolution 
+     * base class, configuring the convolution layer with the provided parameters for
+     * efficient execution on the CPU.
+     * 
+     * @param conv2d_params The TorchConv2d object containing convolution parameters.
+     */
+    void InitConvolution(const TorchConv2d& conv2d_params) override;
+
+    /**
      * @brief Performs the forward pass of the Convolution layer using CPU resources.
      * 
      * This function overrides the pure virtual `Forward` method from the base `Convolution` 

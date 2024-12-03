@@ -73,9 +73,6 @@ class Yolov8 : public Model {
     std::unique_ptr<C2f<float>> model_21_c2f_;
 
     std::unique_ptr<Yolov8Detect<float>> model_22_detect_;
-    // std::unique_ptr<DetectFeatureMap<float>> model_22_detect_1_;
-    // std::unique_ptr<DetectFeatureMap<float>> model_23_detect_2_;
-    // std::unique_ptr<DetectFeatureMap<float>> model_24_detect_3_;
 };
 
 }  // namespace oris_ai

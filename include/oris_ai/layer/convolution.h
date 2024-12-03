@@ -43,13 +43,17 @@ class Convolution : public HiddenLayerAbstract<T> {
     ~Convolution() = default;
 
     /**
-     * @brief Initializes the convolution layer with parameters from a TorchConv2d object.
+     * @brief Initializes the convolution layer on the specific device with parameters from a
+     * TorchConv2d object.
      * 
-     * This function sets up the convolutional layer by configuring the weight tensor, bias (if applicable), kernel size, stride, padding, and output dimensions.
+     * This virtual function finalizes the convolution layer setup by applying device-specific 
+     * configurations for the layer on CPU, GPU, or other hardware. It uses the initial
+     * parameters prepared by ConvolutionSetup() and extends the setup to include any
+     * device-specific optimizations or settings.
      * 
      * @param conv2d_params The TorchConv2d object containing convolution parameters.
      */
-    void InitConvolution(const TorchConv2d& conv2d_params);
+    virtual void InitConvolution(const TorchConv2d& conv2d_params) = 0;
 
     /**
      * @brief Sets the activation function for the convolution layer.
@@ -95,6 +99,20 @@ class Convolution : public HiddenLayerAbstract<T> {
 #endif
 
   protected:
+    /**
+     * @brief Configures the convolutional layer with the given parameters from a TorchConv2d
+     * object.
+     * 
+     * This function performs the initial setup of convolution layer parameters, such as
+     * configuring the weight tensor, bias (if applicable), kernel size, stride, padding, and
+     * output dimensions. It does not handle device-specific implementation details, allowing
+     * InitConvolution() to  manage these aspects for specific devices like CPU or GPU through
+     * virtual function overrides.
+     * 
+     * @param conv2d_params The TorchConv2d object containing convolution parameters.
+     */
+    void ConvolutionSetup(const TorchConv2d& conv2d_params);
+
     ActivationType activation_type_;    // The type of activation function used in the layer.
     std::unique_ptr<Tensor<T>> weight_; // A unique pointer to the weight tensor for the layer.
     std::unique_ptr<Tensor<T>> bias_;   // A unique pointer to the bias tensor, if applicable.

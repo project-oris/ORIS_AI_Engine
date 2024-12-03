@@ -21,7 +21,7 @@ template <typename T>
 class UpsampleCPU : public Upsample<T> {
   public:
     /**
-     * @brief Constructor to initialize a MaxPoolingCPU layer without layer_name.
+     * @brief Constructor to initialize a UpsampleCPU layer without layer_name.
      */
     UpsampleCPU() : Upsample<T>() {}
 
