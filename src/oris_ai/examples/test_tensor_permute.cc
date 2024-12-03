@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "oris_ai/common/tensor.h"
+#include "oris_ai/tensor/tensor.h"
 
 int main(int argc, char** argv) {
   // Create a 3D tensor with a size of 2x3x4.

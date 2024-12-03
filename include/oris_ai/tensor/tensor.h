@@ -97,11 +97,20 @@ class Tensor {
     const T* GetCPUDataPtr() const;
 
     /**
-     * @brief Retrieves a pointer to the data stored in GPU memory, copying from CPU if necessary.
+     * @brief Retrieves a pointer to the data stored in GPU memory, copying from CPU if
+     * necessary.
      * 
      * @return T* Pointer to the data in GPU memory.
      */
     T* GetGPUDataPtr();
+
+    /**
+     * @brief Retrieves a constant pointer to the data stored in GPU memory, copying from CPU
+     * if necessary.
+     * 
+     * @return const T* A constant pointer to the data in GPU memory.
+     */
+    const T* GetGPUDataPtr() const;
 
     /**
      * @brief Retrieves a reference to the tensor element in CPU memory at a specific multi-dimensional index, copying from GPU if necessary.
@@ -141,7 +150,7 @@ class Tensor {
     /** 
      * @brief Returns the total count of the tensor.
      */
-    inline const size_t GetTotalCount() const { return total_count_; }
+    inline size_t GetTotalCount() const { return total_count_; }
 
     /**
      * @brief Adds the values of another Tensor to this Tensor.
@@ -182,6 +191,20 @@ class Tensor {
     void Split(const std::vector<size_t>& split_sizes, size_t split_dim, const std::initializer_list<Tensor<T>*>& split_tensors, bool use_view_input=false);
 
     /**
+     * @brief Calculates the stride for a specific dimension in the tensor.
+     * 
+     * This function computes the stride for a given dimension, which represents
+     * the number of elements to skip in memory to move to the next element along that
+     * dimension. The stride is calculated based on the dimensions of the tensor shape.
+     * 
+     * @param dim The dimension index for which to calculate the stride.
+     * @param use_view_shape If true, applies the transpose to the view shape if set;
+     * otherwise, applies to the main shape.
+     * @return The calculated stride for the specified dimension.
+     */
+    size_t GetDimensionStride(size_t dim, bool use_view_shape = false) const;
+
+    /**
      * @brief Sets the view shape of the tensor.
      * 
      * The view shape allows the tensor to have a temporary shape different from its original
@@ -216,6 +239,8 @@ class Tensor {
      */
     void Transpose(size_t dim1, size_t dim2, bool use_view_shape = false);
 
+    inline Device GetDevice() { return head_; }
+
   private:
     std::vector<size_t> shape_;     // Stores the shape (dimensions) of the tensor
     std::vector<size_t> view_shape_;// Stores the view shape (dimensions) of the tensor
@@ -245,6 +270,13 @@ class Tensor {
     void EnsureCPUDataReady();
 
     /**
+     * @brief Handles the copying of data from CPU to GPU and updates the head.
+     * This method consolidates the common logic for transferring data from CPU
+     * to GPU or initializing GPU state when the head is uninitialized.
+     */
+    void EnsureGPUDataReady();
+
+    /**
      * @brief Converts multi-dimensional indices to a flat index for 1D memory access.
      * @param indices A pointer to an array of size_t representing the multi-dimensional
      * indices.
@@ -266,20 +298,6 @@ class Tensor {
      *         Returns false if the end of all dimensions has been reached.
      */
     bool IncrementIndices(size_t* indices, const std::vector<size_t>& shape) const;
-
-    /**
-     * @brief Calculates the stride for a specific dimension in the tensor.
-     * 
-     * This function computes the stride for a given dimension, which represents
-     * the number of elements to skip in memory to move to the next element along that
-     * dimension. The stride is calculated based on the dimensions of the tensor shape.
-     * 
-     * @param dim The dimension index for which to calculate the stride.
-     * @param use_view_shape If true, applies the transpose to the view shape if set;
-     * otherwise, applies to the main shape.
-     * @return The calculated stride for the specified dimension.
-     */
-    size_t GetDimensionStride(size_t dim, bool use_view_shape = false) const;
 };
 
 } // namespace oris_ai

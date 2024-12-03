@@ -37,12 +37,18 @@ class MaxPooling : public HiddenLayerAbstract<T> {
      */
     ~MaxPooling() = default;
 
-    /**
-     * @brief Initializes the pooling layer with parameters from a TorchMaxPool2d object.
+    /** 
+     * @brief Initializes the max pooling layer on the specific device with parameters from a
+     * TorchMaxPool2d object.
+     * 
+     * This virtual function finalizes the max pooling layer setup by applying device-specific 
+     * configurations for the layer on CPU, GPU, or other hardware. It uses the initial
+     * parameters prepared by MaxPoolingSetup() and extends the setup to include any
+     * device-specific optimizations or settings.
      * 
      * @param maxpool2d_params The TorchMaxPool2d object containing max pooling parameters.
      */
-    void InitMaxPooling(const TorchMaxPool2d& maxpool2d_params);
+    virtual void InitMaxPooling(const TorchMaxPool2d& maxpool2d_params) = 0;
 
     /**
      * @brief Pure virtual function to perform the forward pass of the max pooling layer.
@@ -53,6 +59,20 @@ class MaxPooling : public HiddenLayerAbstract<T> {
     virtual void Forward() = 0;
 
   protected:
+    /**
+     * @brief Configures the max pooling layer with the given parameters from a TorchMaxPool2d
+     * object.
+     * 
+     * This function performs the initial setup of max pooling layer parameters, such as
+     * configuring the kernel size, stride, padding, and output dimensions based on the
+     * TorchMaxPool2d parameters. It does not handle device-specific implementation details,
+     * allowing InitMaxPooling() to manage these aspects for specific devices like CPU or GPU
+     * through virtual function overrides.
+     * 
+     * @param maxpool2d_params The TorchMaxPool2d object containing max pooling parameters.
+     */
+    void MaxPoolingSetup(const TorchMaxPool2d& maxpool2d_params);
+
     size_t kernel_size_;    // The size of the pooling kernel
     size_t stride_;         // The stride of the pooling operation
     size_t padding_;        // The padding size for the pooling operation

@@ -4,7 +4,7 @@
 ******************************************************************************/
 #pragma once
 
-#include "oris_ai/common/tensor.h"
+#include "oris_ai/tensor/tensor.h"
 #include "oris_ai/protobuf/oris_ai_yolov8.pb.h"
 
 namespace oris_ai {

@@ -4,10 +4,11 @@
 ******************************************************************************/
 #pragma once
 
-#include <opencv2/opencv.hpp>
-
 struct Detection {
   int class_id{0};
   float confidence{0.0f};
-  cv::Rect box{};
+  float x1{0.0f};
+  float y1{0.0f};
+  float x2{0.0f};
+  float y2{0.0f};
 };

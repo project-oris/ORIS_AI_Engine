@@ -6,6 +6,7 @@
 
 #include "oris_ai/layer/concat.h"
 #include "oris_ai/layer/convolution.h"
+#include "oris_ai/layer/split.h"
 #include "oris_ai/layer/custom/bottleneck.h"
 
 namespace oris_ai {
@@ -27,9 +28,9 @@ class C2f : public HiddenLayerAbstract<T> {
     C2f(const std::string& layer_name, Device target_device, bool shortcut, int bottleneck_count);
 
     /**
-     * @brief Destructor for the C2f class.
+     * @brief Default destructor for the C2f class.
      */
-    ~C2f();
+    ~C2f() = default;
 
     /**
      * @brief Initializes the C2f layer with the given TorchLayer data.
@@ -54,14 +55,14 @@ class C2f : public HiddenLayerAbstract<T> {
 
   private:
     std::unique_ptr<Convolution<T>> c2f_cv1_;  // First convolution layer
+    std::unique_ptr<Split<T>> c2f_cv1_split_;    // Layer to concatenate before cv2
     std::vector<std::unique_ptr<Bottleneck<T>>> c2f_bottlenecks_;  // Vector of bottleneck layers
     std::unique_ptr<Convolution<T>> c2f_cv2_;  // Second convolution layer
-    std::unique_ptr<Concat<T>> c2f_concat_;    // Layer to concatenate before cv2
+    std::unique_ptr<Concat<T>> c2f_concat_;    // Layer to concatenate before cv2    
 
     bool shortcut_;  // Indicates if shortcut (add) operation is enabled
     int bottleneck_count_;  // Number of bottleneck layers
 
-    std::vector<size_t> split_sizes_;  // Stores fixed split sizes for the feature maps
     Tensor<T>* c2f_cv1_split_0_;
     Tensor<T>* c2f_cv1_split_1_;
 };

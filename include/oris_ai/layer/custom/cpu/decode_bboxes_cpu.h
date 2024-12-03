@@ -9,7 +9,7 @@
 namespace oris_ai {
 
 /**
- * @class DecodeBboxesCPUCPU
+ * @class DecodeBboxesCPU
  * @brief Represents a CPU-specific implementation of the DecodeBboxes layer.
  * 
  * This class defines the CPU-specific version of the DecodeBboxes layer, inheriting from
@@ -21,7 +21,7 @@ template <typename T>
 class DecodeBboxesCPU : public DecodeBboxes<T> {
   public:
     /**
-     * @brief Constructor to initialize a DFLCPU layer with layer_name.
+     * @brief Constructor to initialize a DecodeBboxesCPU layer with layer_name.
      * @param layer_name The name of the layer.
      */
     DecodeBboxesCPU(const std::string& layer_name) : DecodeBboxes<T>(layer_name, Device::CPU) {}
@@ -34,7 +34,8 @@ class DecodeBboxesCPU : public DecodeBboxes<T> {
     /**
      * @brief Performs the forward pass of the DecodeBboxes layer on the CPU.
      * 
-     * This function implements the forward pass for the DecodeBboxes layer using CPU operations.
+     * This function implements the forward pass for the DecodeBboxes layer using CPU
+     * operations.
      */
     void Forward() override;
 };

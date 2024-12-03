@@ -1,10 +1,11 @@
 #include <opencv2/opencv.hpp>
 
-#include "oris_ai/common/tensor.h"
+#include "oris_ai/tensor/tensor.h"
 
 #include <chrono>   // for debug
 #include <fstream>  // for debug
 
+// Function to compute image resize scale
 float generate_scale(cv::Mat& image, const std::vector<int>& target_size) {
   int origin_w = image.cols;
   int origin_h = image.rows;
@@ -18,6 +19,7 @@ float generate_scale(cv::Mat& image, const std::vector<int>& target_size) {
   return resize_scale;
 }
 
+// Function to apply letterbox padding
 float letterbox(cv::Mat& input_image, cv::Mat& output_image, const std::vector<int>& target_size) {
   if (input_image.cols == target_size[1] && input_image.rows == target_size[0]) {
     if (input_image.data == output_image.data) {

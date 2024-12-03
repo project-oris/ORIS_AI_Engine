@@ -197,3 +197,15 @@ int main(int argc, char** argv) {
     return 0;
 }
 ```
+
+## 8. Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
+
+## 9. Authors
+Seungtae Hong - sthong@etri.re.kr
+
+## 10. Acknowledgment
+This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) grant funded by the Korea government(MSIT) (No. RS-2024-00339187, Core Technology Development of On-device Robot Intelligence SW Platform)
+
+## 11.License
+Distributed under the MIT License.

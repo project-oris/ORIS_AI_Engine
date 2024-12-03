@@ -7,6 +7,8 @@
 #include "oris_ai/layer/layer.h"
 #include "oris_ai/model/yolov8/yolov8_type.h"
 
+#include <opencv2/opencv.hpp>
+
 namespace oris_ai {
 
 class Model {
@@ -40,6 +42,8 @@ class Model {
      * @param rb_swap If set to `true`, the function will convert the image from BGR to RGB format. Defaults to `false` (BGR format).
      */
     void SetInputImageTensor(const cv::Mat& input_image, float normalization_value, bool rb_swap = false);
+
+    inline Tensor<float>* GetInputImageTensor() { return input_image_tensor_.get(); }
 
     /**
      * @brief Pure virtual function to open the model.
