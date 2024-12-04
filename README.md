@@ -1,11 +1,12 @@
-# Oris_AI
-Oris_AI is a deep learning framework especially for on-devices.
+# ORIS_AI
+ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-device Robot Intelligence SW-System) project.
 
 ## 1. Supported Layer
- - Input: Image Files, OpenCV Mat
- - CNN: Convolution, MaxPooling
+ - Input: OpenCV Mat
+ - CNN: Concat, Convolution, MaxPooling, Split, Transpose
  - Activation: SiLU
- - Output: Detect(Yolo v8)
+ - Custom (for Yolo v8): C2f, BottleNeck (for C2f), DFL, SPPF
+ - Output (for Yolo v8): Detect 
 
 ## 2. Supported DNN
  - Detection: Yolo v8
@@ -18,10 +19,13 @@ Ubuntu | 22.04 | lsb_release -a
 gcc/g++ | 11.4.0 | gcc --version
 cmake | 3.30.2 | cmake --version
 cudatoolkit | 12.1 | nvcc --version
-cudnn | 9.1 | cat /usr/local/cuda/include/cudnn_version.h | grep CUDNN_MAJOR -A 2
+cudnn | 9.1 | cat {Your CUDNN Install Path}/cudnn_version.h | grep CUDNN_MAJOR -A 2
+opencv | 4.8
+protobuf | 3.12.4 | protoc --version
 
 ## 4. Prerequisites
 - cmake [Required]
+- eigen [Required]
 - protobuf [Required]
 - glog [Required]
 - OpenCV [Required] : https://github.com/opencv/opencv
@@ -37,24 +41,80 @@ $ sudo apt-get install cmake
 $ sudo apt-get install cmake-curses-gui # Only needed if you plan to use ccmake
 ```
 
-### 4-2. protobuf
+### 4-2. eigen
+```
+$ sudo apt-get install libeigen3-dev
+```
+
+### 4-3. protobuf
 ```
 $ sudo apt-get install libprotobuf-dev
 ```
 
-### 4-3. glog
+### 4-4. glog
 ```
 $ sudo apt-get install libgoogle-glog-dev
 ```
 
-### 4-4. OpenCV
-To do
-
 ### 4-5. OpenBLAS
-To do
+#### 4-5-1. Build OpenBLAS
+```
+$ sudo apt-get build-essential gfortran
+$ git clone https://github.com/xianyi/OpenBLAS.git {OpenBLAS_Path}
+$ cd {OpenBLAS_Path}
+$ make FC=gfortran -j$(nproc)
+$ make install PREFIX=/usr/local
+$ ldconfig
+```
 
-## 5. How to compile Oris_AI
-The installation path of Oris_AI (currently {ORIS_AI_OSS_PATH}) needs to be modified to suit your environment.
+#### 4-5-2. Configure OPENBLAS_NUM_THREADS 
+```
+$ cd ~
+$ vi .bashrc
+```
+Then add OPENBLAS_NUM_THREADS=n to the last line.
+n is the maximum number of threads that your CPU supports.
+If you want to check the number of CPU cores in the current system, enter the command below.
+```
+$ grep -c processor /proc/cpuinfo
+```
+After editing the shell environment, reflect the edited shell environment and check the modified contents.
+```
+$ source .bashrc
+$ echo $OPENBLAS_NUM_THREADS
+```
+
+### 4-6. OpenCV
+#### 4-6-1. Install prerequisites for openCV
+```
+$ sudo apt-get build-essential
+$ sudo apt-get libjpeg-dev libtiff5-dev libpng-dev
+$ sudo apt-get ffmpeg libavcodec-dev libavformat-dev libswscale-dev libxvidcore-dev libx264-dev libxine2-dev
+$ sudo apt-get libv4l-dev v4l-utils
+$ sudo apt-get libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+$ sudo apt-get libgtk-3-dev
+$ sudo apt-get libatlas-base-dev gfortran libeigen3-dev
+$ sudo apt-get python3-dev python3-numpy
+```
+
+#### 4-6-2. Build OpenCV
+```
+$ git clone https://github.com/opencv/opencv.git {OpenCV_Path}
+$ cd {OpenCV_Path}
+$ mkdir build && cd build
+$ cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+-D WITH_CUDA=OFF -D WITH_CUBLAS=OFF -D WITH_CUFFT=OFF -D WITH_MATLAB=OFF \
+-D WITH_IPP=OFF -D WITH_1394=OFF -D WITH_OPENCLAMDBLAS=OFF -D WITH_OPENCLAMDFFT=OFF \
+-D WITH_TBB=OFF -D WITH_XINE=OFF \
+-D INSTALL_C_EXAMPLES=OFF -D INSTALL_PYTHON_EXAMPLES=OFF -D BUILD_EXAMPLES=OFF \
+-D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_WITH_DEBUG_INFO=OFF -D BUILD_DOCS=OFF ..
+$ make -j$(nproc)
+$ make install
+$ sudo ldconfig
+```
+
+## 5. How to compile ORIS_AI
+The installation path of ORIS_AI (currently {ORIS_AI_OSS_PATH}) needs to be modified to suit your environment.
 
 ### 5-1. Native compile
 ```
@@ -72,7 +132,7 @@ $ cd {ORIS_AI_OSS_PATH}/build
 $ ccmake ..
 ```
 
-## 6. How to run Oris_AI
+## 6. How to run ORIS_AI
 The source codes of example are located in the following path.
 ```
 {ORIS_AI_OSS_PATH}/src/oris_ai/examples
