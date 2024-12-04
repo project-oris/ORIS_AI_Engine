@@ -20,8 +20,9 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Lib 디렉토리 및 라이브러리 설정
 link_directories(${PROJECT_SOURCE_DIR}/lib)
-set(ORIS_LIB ORIS_AI)
+set(ORIS_AI_LIB "ORISCore")
 set(ACCELERATOR_CUDA_Kernel_LIB "ORISCUDA")
+set(ORIS_AI_OSS_LIB "ORISOSS")
 
 # 필수 설치 패키지
 set(target_libraries "")
@@ -38,5 +39,5 @@ foreach(EXAMPLE_SRC ${EXAMPLES_SRCS})
   add_executable(${EXAMPLE_NAME} ${EXAMPLE_SRC})
 
   # 예제에 라이브러리 연결
-  target_link_libraries(${EXAMPLE_NAME} ${ORIS_LIB} ${ACCELERATOR_CUDA_Kernel_LIB} ${target_libraries})
+  target_link_libraries(${EXAMPLE_NAME} ${ORIS_AI_LIB} ${ACCELERATOR_CUDA_Kernel_LIB} ${ORIS_AI_OSS_LIB} ${target_libraries})
 endforeach()

@@ -26,34 +26,37 @@
     }                                                                    \
   } while (0)
 
-class CUDNNManager {
-  public:
-    CUDNNManager() : use_benchmark_(false) {}
-    ~CUDNNManager() = default;
+#define CUDNN_VERSION_MIN(major, minor, patch) \
+  (CUDNN_VERSION >= (major * 1000 + minor * 100 + patch))
 
-    /**
-     * @brief Deleted copy constructor to prevent copying of the singleton instance.
-     */
-    CUDNNManager(const CUDNNManager&) = delete;
+// class CUDNNManager {
+//   public:
+//     CUDNNManager() : use_benchmark_(true) {}
+//     ~CUDNNManager() = default;
 
-    /**
-     * @brief Deleted copy assignment operator to prevent assignment of the singleton instance.
-     */
-    CUDNNManager& operator=(const CUDNNManager&) = delete;
+//     /**
+//      * @brief Deleted copy constructor to prevent copying of the singleton instance.
+//      */
+//     CUDNNManager(const CUDNNManager&) = delete;
 
-    /**
-     * @brief Singleton instance getter for CUDNNManager
-     * Ensures only one instance of the CUDNNManager exists
-     * @return Reference to the singleton instance
-     */
-    static CUDNNManager& GetInstance() {
-      static CUDNNManager instance;
-      return instance;
-    }
+//     /**
+//      * @brief Deleted copy assignment operator to prevent assignment of the singleton instance.
+//      */
+//     CUDNNManager& operator=(const CUDNNManager&) = delete;
 
-    inline void SetUseBenchmark(bool use_benchmark) {use_benchmark_ = use_benchmark;}
-    inline bool GetUseBenchmark() {return use_benchmark_;}
+//     /**
+//      * @brief Singleton instance getter for CUDNNManager
+//      * Ensures only one instance of the CUDNNManager exists
+//      * @return Reference to the singleton instance
+//      */
+//     static CUDNNManager& GetInstance() {
+//       static CUDNNManager instance;
+//       return instance;
+//     }
 
-  protected:
-    bool use_benchmark_;
-};
+//     inline void SetUseBenchmark(bool use_benchmark) {use_benchmark_ = use_benchmark;}
+//     inline bool GetUseBenchmark() {return use_benchmark_;}
+
+//   protected:
+//     bool use_benchmark_;
+// };
