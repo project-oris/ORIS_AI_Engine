@@ -90,11 +90,13 @@ class Tensor {
 
     /**
      * @brief Retrieves a constant pointer to the data stored in CPU memory, copying from GPU
-     * if necessary.
+     * if necessary. Optionally retains the current device state as GPU.
      * 
+     * @param keep_head_gpu If true, retains the current device state as GPU even after
+     * copying data to CPU.
      * @return const T* A constant pointer to the data in CPU memory.
      */
-    const T* GetCPUDataPtr() const;
+    const T* GetConstCPUDataPtr(bool keep_head_gpu = false) const;
 
     /**
      * @brief Retrieves a pointer to the data stored in GPU memory, copying from CPU if
@@ -110,7 +112,7 @@ class Tensor {
      * 
      * @return const T* A constant pointer to the data in GPU memory.
      */
-    const T* GetGPUDataPtr() const;
+    const T* GetConstGPUDataPtr() const;
 
     /**
      * @brief Retrieves a reference to the tensor element in CPU memory at a specific multi-dimensional index, copying from GPU if necessary.
@@ -263,11 +265,15 @@ class Tensor {
     void AllocateGPUMemory();
 
     /**
-     * @brief Handles the copying of data from GPU to CPU and updates the head.
+     * @brief Ensures the tensor data is ready in CPU memory, copying from GPU if necessary.
      * This method consolidates the common logic for transferring data from GPU
      * to CPU or initializing CPU state when the head is uninitialized.
+     * 
+     * @param keep_head_gpu If true, retains the current device state as GPU even after
+     * copying data to CPU. This is useful when GPU state needs to be preserved
+     * for further operations without switching the head to CPU.
      */
-    void EnsureCPUDataReady();
+    void EnsureCPUDataReady(bool keep_head_gpu = false);
 
     /**
      * @brief Handles the copying of data from CPU to GPU and updates the head.

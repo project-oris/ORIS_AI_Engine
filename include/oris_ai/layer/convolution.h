@@ -43,6 +43,21 @@ class Convolution : public HiddenLayerAbstract<T> {
     ~Convolution() = default;
 
     /**
+     * @brief Initializes the convolution layer with both convolution and activation
+     * parameters.
+     * 
+     * This pure virtual function sets up the convolution layer on a specific device,
+     * combining the initialization of convolution parameters from a TorchConv2d object and
+     * the activation function from a TorchActivation object. It finalizes the setup for the
+     * layer, ensuring that both the convolution operation and its post-processing activation
+     * function are configured for optimal execution on the target device (CPU, GPU, etc.).
+     * 
+     * @param conv2d_params The TorchConv2d object containing convolution parameters.
+     * @param act The TorchActivation object containing the activation type and its parameters.
+     */
+    virtual void InitConvolution(const TorchConv2d& conv2d_params, const TorchActivation& act) = 0;
+
+    /**
      * @brief Initializes the convolution layer on the specific device with parameters from a
      * TorchConv2d object.
      * 

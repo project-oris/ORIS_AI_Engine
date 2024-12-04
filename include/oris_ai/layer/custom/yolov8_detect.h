@@ -33,12 +33,12 @@ class Yolov8Detect : public LayerAbstract<T> {
      * @brief Default destructor for the Yolov8Detect class.
      */
     ~Yolov8Detect() = default;
+    // ~Yolov8Detect();
 
     /**
      * @brief Initializes the Yolov8Detect layer.
-     * @note The actual initialization logic will be implemented later.
      */
-    void InitYoloV8Detect(const std::vector<TorchLayer>& detect_layers, size_t num_classes = 80);
+    void InitYoloV8Detect(const std::vector<TorchLayer>& detect_layers);
 
     /**
      * @brief Perform the forward pass for the Yolov8Detect layer.
@@ -50,7 +50,10 @@ class Yolov8Detect : public LayerAbstract<T> {
     }
 
     // score_threshold = conf_thres in PyTorch Yolo v8
-    void ApplyNMS(float score_threshold, float iou_threshold, int max_det);
+    void ApplyNMSCPU(float score_threshold, float iou_threshold, int max_det);
+
+    // score_threshold = conf_thres in PyTorch Yolo v8
+    // void ApplyNMSGPU(float score_threshold, float iou_threshold, int max_det);
 
   private:
     void MakeAnchors(const std::vector<Tensor<T>*>& feature_maps, const std::array<float, 3> stride = {8.0f, 16.0f, 32.0f}, float grid_cell_offset = 0.5f);
@@ -74,6 +77,16 @@ class Yolov8Detect : public LayerAbstract<T> {
     Tensor<T>* box_;
     Tensor<T>* cls_;
 
+    // for cuda
+    // T* result_dbox_x1_;
+    // T* result_dbox_y1_;
+    // T* result_dbox_x2_;
+    // T* result_dbox_y2_;
+    // T* result_max_conf_;
+    // int* result_max_class_idx_;
+    // int* result_count_;
+
+    // final result
     std::vector<Detection> detection_result_;
 };
 

@@ -38,6 +38,8 @@ class ConvolutionCPU : public Convolution<T> {
      */
     ~ConvolutionCPU() = default;
 
+    void InitConvolution(const TorchConv2d& conv2d_params, const TorchActivation& act) override;
+
     /**
      * @brief Overrides the virtual InitConvolution function for CPU-specific initialization.
      * 

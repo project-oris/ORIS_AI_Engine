@@ -1,3 +1,7 @@
+/****************************************************************************** 
+// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
+// All Rights Reserved.
+******************************************************************************/
 #include <iostream>
 #include <vector>
 

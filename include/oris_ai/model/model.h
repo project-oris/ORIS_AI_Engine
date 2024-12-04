@@ -16,40 +16,71 @@ class Model {
     /**
      * @brief Constructor to initialize a Model with a given name.
      */
-    Model(const std::string& model_name, Device target_device, size_t input_height, size_t input_width) : model_name_(model_name), target_device_(target_device), input_height_(input_height), input_width_(input_width) {}
+    Model(const std::string& model_name, Device target_device) : model_name_(model_name), target_device_(target_device), input_height_(0), input_width_(0), normalization_value_(1.0f) {}
 
     /**
      * @brief Virtual destructor for the Concat class.
      */
     virtual ~Model() = default;
+    
 
     /**
-     * @brief Sets the input image as a tensor for the model, with optional RGB swapping and normalization.
+     * @brief Creates the input tensor with the specified height, width, and normalization
+     * value.
      *
-     * This function converts an input image (in OpenCV's `cv::Mat` format) to a tensor
-     * that can be used as the input for the model. It supports optional BGR to RGB 
-     * conversion and allows normalization of the pixel values.
+     * This function initializes the input tensor to the specified dimensions and prepares it
+     * for subsequent use in the model. If the input tensor is not already created, it
+     * allocates memory for the tensor based on the input shape (NCHW format) and fills it
+     * with a default value (e.g., zeros).
+     * The normalization value is stored for later use in pixel value normalization during
+     * input preprocessing.
      *
-     * The input image is assumed to be in BGR format by default, which is common for 
-     * images loaded using OpenCV. If the `rb_swap` flag is set to `true`, the function 
-     * will convert the image from BGR to RGB. After optional conversion, the pixel values 
-     * of the image will be normalized by dividing each value by the given `normalization_value`.
-     *
-     * The image will be transformed from OpenCV's default NHWC format (batch size, height, width, channels) to the NCHW format required by the model.
-     *
-     * @param input_image The input image in `cv::Mat` format. It should be a valid image matrix.
-     * @param normalization_value The value to normalize pixel values. Typically, it is 255.0 for images with pixel values in the 0-255 range.
-     * @param rb_swap If set to `true`, the function will convert the image from BGR to RGB format. Defaults to `false` (BGR format).
+     * @param input_height The height of the input tensor in pixels.
+     * @param input_width The width of the input tensor in pixels.
+     * @param normalization_value The value used for normalizing the pixel values. Typically
+     * set to 255.0 for images with pixel values in the 0-255 range.
      */
-    void SetInputImageTensor(const cv::Mat& input_image, float normalization_value, bool rb_swap = false);
+    void CreateInputImageTensor(size_t input_height, size_t input_width, float normalization_value);
 
-    inline Tensor<float>* GetInputImageTensor() { return input_image_tensor_.get(); }
+    /**
+     * @brief Converts and sets an input image as a tensor in NCHW format with normalization.
+     *
+     * This function processes an input image in OpenCV's `cv::Mat` format and prepares it for
+     * use as a model input.
+     * Normalize pixel values ​​by dividing each value by the normalization value specified in
+     * CreateInputImageTensor(). The function transforms the image data from NHWC format (batch
+     * size, height, width, channels) to the NCHW format (batch size, channels, height, width)
+     * required by the model.
+     *
+     * The input image's shape must match the dimensions specified during the tensor creation;
+     * otherwise, an error will be raised. The processed tensor data is subsequently
+     * transferred to the target device (e.g., CPU or GPU).
+     *
+     * @param input_image The input image as a `cv::Mat` object. It must be a valid 3-channel
+     * image matrix in BGR format by default.
+     */
+    void SetInputImageTensor(const cv::Mat& input_image);
 
     /**
      * @brief Pure virtual function to open the model.
+     * 
      * Each derived class (e.g., Yolov8n) must implement this function.
      */
-    virtual bool Open(const std::string& model_path) = 0;
+    virtual void Open(const std::string& model_path) = 0;
+
+    /**
+     * @brief Pure virtual function to open the model from an array.
+     * 
+     * This function allows the model to be loaded directly from a binary array
+     * instead of a file. It is particularly useful when the model is embedded
+     * as a resource within the application (e.g., via xxd).
+     *
+     * Each derived class (e.g., Yolov8n) must implement this function.
+     *
+     * @param model_data Pointer to the binary model data.
+     * @param model_size Size of the binary model data in bytes.
+     */
+    virtual void OpenFromArray(const unsigned char* model_data, size_t model_size) = 0;
 
     /**
      * @brief Pure virtual function that performs a forward pass through the model.
@@ -59,14 +90,37 @@ class Model {
      */
     virtual void Forward() = 0;
 
+    /**
+     * @brief Performs Non-Maximum Suppression (NMS) to filter overlapping detection boxes.
+     *
+     * This function applies Non-Maximum Suppression (NMS) to a set of detection boxes,
+     * removing boxes with lower confidence scores that overlap significantly with
+     * higher-confidence boxes.
+     * The goal is to retain only the most relevant detections while eliminating redundant or 
+     * overlapping boxes. 
+     *
+     * The function is virtual and must be implemented by derived classes. The parameters
+     * control the behavior of the NMS operation, including the confidence score threshold,
+     * Intersection over Union (IoU) threshold, and the maximum number of detections to keep.
+     *
+     * @param score_threshold The confidence score threshold. Detections with scores below
+     * this value will be discarded. Defaults to 0.25.
+     * @param iou_threshold The IoU threshold for determining whether two boxes overlap
+     * significantly. A lower value makes the suppression stricter. Defaults to 0.45.
+     * @param max_det The maximum number of detections to retain after applying NMS. Defaults
+     * to 300.
+     */
     virtual void NonMaxSuppression(float score_threshold = 0.25f, float iou_threshold = 0.45f, int max_det = 300) = 0;
 
-    // Pure virtual function for GetResult
+    /**
+     * @brief Retrieves the final detection results after processing.
+     *
+     * @return A constant reference to a vector of `Detection` objects, each representing a detected object.
+     */
     virtual inline const std::vector<Detection>& GetResult() const = 0;
 
-  protected:
-    void CreateDummyInputTensor();
 
+  protected:
     std::string model_name_;  // The name of the model
     std::vector<std::unique_ptr<oris_ai::HiddenLayerAbstract<float>>> layers_;  // Vector to manage all created layers
 
@@ -75,6 +129,7 @@ class Model {
 
     size_t input_height_;
     size_t input_width_;
+    float normalization_value_;
 };
 
 /**

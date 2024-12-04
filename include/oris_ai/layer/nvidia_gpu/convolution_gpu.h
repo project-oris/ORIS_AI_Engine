@@ -39,6 +39,8 @@ class ConvolutionGPU : public Convolution<T> {
      */
     ~ConvolutionGPU();
 
+    void InitConvolution(const TorchConv2d& conv2d_params, const TorchActivation& act) override;
+
     /**
      * @brief Overrides the virtual InitConvolution function for NVIDIA GPU-specific
      * initialization.
@@ -60,20 +62,18 @@ class ConvolutionGPU : public Convolution<T> {
     void Forward() override;
 
   private:
+    void CudnnSetup(const TorchConv2d& conv2d_params);
+
+    // Common variables
     cudnnHandle_t cudnn_handle_;
     cudnnTensorDescriptor_t input_desc_, output_desc_;
     cudnnFilterDescriptor_t filter_desc_;
     cudnnConvolutionDescriptor_t conv_desc_;
     cudnnTensorDescriptor_t bias_desc_;
-
-    // activation
-    // cudnnActivationDescriptor_t act_desc_;
-
-    // cudnn convolution forward algorithm
-    cudnnConvolutionFwdAlgo_t conv_algo_;
-
     void* work_space_;
     size_t size_work_space_;
+
+    cudnnConvolutionFwdAlgo_t conv_algo_;
 };
 
 } // namespace oris_ai
