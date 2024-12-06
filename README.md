@@ -59,7 +59,7 @@ $ sudo apt-get install libgoogle-glog-dev
 ### 4-5. OpenBLAS
 #### 4-5-1. Build OpenBLAS
 ```
-$ sudo apt-get build-essential gfortran
+$ sudo apt-get install build-essential gfortran
 $ git clone https://github.com/xianyi/OpenBLAS.git {OpenBLAS_Path}
 $ cd {OpenBLAS_Path}
 $ make FC=gfortran -j$(nproc)
@@ -87,14 +87,14 @@ $ echo $OPENBLAS_NUM_THREADS
 ### 4-6. OpenCV
 #### 4-6-1. Install prerequisites for openCV
 ```
-$ sudo apt-get build-essential
-$ sudo apt-get libjpeg-dev libtiff5-dev libpng-dev
-$ sudo apt-get ffmpeg libavcodec-dev libavformat-dev libswscale-dev libxvidcore-dev libx264-dev libxine2-dev
-$ sudo apt-get libv4l-dev v4l-utils
-$ sudo apt-get libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
-$ sudo apt-get libgtk-3-dev
-$ sudo apt-get libatlas-base-dev gfortran libeigen3-dev
-$ sudo apt-get python3-dev python3-numpy
+$ sudo apt-get install build-essential
+$ sudo apt-get install libjpeg-dev libtiff5-dev libpng-dev
+$ sudo apt-get install ffmpeg libavcodec-dev libavformat-dev libswscale-dev libxvidcore-dev libx264-dev libxine2-dev
+$ sudo apt-get install libv4l-dev v4l-utils
+$ sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+$ sudo apt-get install libgtk-3-dev
+$ sudo apt-get install libatlas-base-dev gfortran libeigen3-dev
+$ sudo apt-get install python3-dev python3-numpy
 ```
 
 #### 4-6-2. Build OpenCV

@@ -18,8 +18,20 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Include 디렉토리 설정
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
+# 시스템 아키텍처 확인
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+  set(LIB_ARCH_DIR "${PROJECT_SOURCE_DIR}/lib/x86_64")
+  message(STATUS "Building for x86_64 architecture.")
+elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+  set(LIB_ARCH_DIR "${PROJECT_SOURCE_DIR}/lib/aarch_64")
+  message(STATUS "Building for aarch64 architecture.")
+else()
+  message(STATUS "Unknown architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+
 # Lib 디렉토리 및 라이브러리 설정
-link_directories(${PROJECT_SOURCE_DIR}/lib)
+link_directories(${LIB_ARCH_DIR})
+message(STATUS "Library directory set to: ${LIB_ARCH_DIR}")
 set(ORIS_AI_LIB "ORISCore")
 set(ACCELERATOR_CUDA_Kernel_LIB "ORISCUDA")
 set(ORIS_AI_OSS_LIB "ORISOSS")
