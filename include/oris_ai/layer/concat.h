@@ -1,7 +1,24 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
 #include "oris_ai/layer/layer.h"
@@ -22,16 +39,13 @@ template <typename T>
 class Concat : public HiddenLayerAbstract<T> {
   public:
     /**
-     * @brief Constructor to initialize a concatenation layer without layer_name.
-     */
-    Concat() : HiddenLayerAbstract<T>(), concat_dim_(1), use_view_input_shape_(false) {}
-
-    /**
      * @brief Constructor to initialize a concatenation layer.
      * @param name The name of the layer.
      */
-    Concat(const std::string& layer_name) 
-      : HiddenLayerAbstract<T>(layer_name), concat_dim_(1), use_view_input_shape_(false) {}
+    Concat(const std::string& layer_name)
+      : HiddenLayerAbstract<T>(layer_name),
+        concat_dim_(1),
+        use_view_input_shape_(false) {}
 
     /**
      * @brief Destructor for the Concat class.
@@ -43,7 +57,7 @@ class Concat : public HiddenLayerAbstract<T> {
      * 
      * @param concat_params The TorchConcat object containing concat parameters.
      */
-    void InitConcat(const TorchConcat& concat_params);
+    virtual void InitConcat(const TorchConcat& concat_params);
 
     /**
      * @brief Initializes the concat layer with the specified concatenation dimension.
@@ -51,7 +65,7 @@ class Concat : public HiddenLayerAbstract<T> {
      * @param use_view_input_shape Flag indicating whether to use the view shape of the input
      * tensor.
      */
-    void InitConcat(const size_t concat_dim, bool use_view_input_shape = false);
+    virtual void InitConcat(const size_t concat_dim, bool use_view_input_shape = false);
 
     /**
      * @brief Pure virtual function to perform the forward pass of the concat layer.

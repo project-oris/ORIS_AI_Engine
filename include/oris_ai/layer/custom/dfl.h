@@ -1,10 +1,29 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
 #include "oris_ai/layer/layer.h"
+#include "oris_ai/layer/matmul.h"
+#include "oris_ai/layer/softmax.h"
 #include "oris_ai/layer/transpose.h"
 
 namespace oris_ai {
@@ -22,9 +41,11 @@ template <typename T>
 class DFL : public HiddenLayerAbstract<T> {
   public:
     /**
-     * @brief Default constructor for the DFL layer without layer_name.
+     * @brief Default constructor for the DFL layer.
+     * @param layer_name The name of the layer.
+     * @param target_device The device (CPU or GPU) on which the layer will operate.
      */
-    DFL(Device target_device);
+    DFL(const std::string& layer_name, Device target_device);
 
     /**
      * @brief Default destructor for the DFL class.
@@ -34,44 +55,30 @@ class DFL : public HiddenLayerAbstract<T> {
     /**
      * @brief Initializes the DFL layer with parameters from a TorchConv2d object.
      * 
-     * This virtual function finalizes the DFL layer setup by applying device-specific     * 
-     * configurations for the layer on CPU, GPU, or other hardware. It uses the initial
-     * parameters prepared by DFLSetup() and extends the setup to include any
-     * device-specific optimizations or settings.
+     * This function sets up the DFL layer by configuring the weight tensor, input/output
+     * channels, and output dimensions based on the provided convolution parameters.
+     * The DFL layer is composed of sub-layers (Transpose, Softmax, MatMul) that handle
+     * the actual computation.
      * 
      * @param conv2d_params The TorchConv2d object containing the convolution parameters.
      */
-    virtual void InitDFL(const TorchConv2d& conv2d_params) = 0;
+    void InitDFL(const TorchConv2d& conv2d_params);
 
     /**
-     * @brief Pure virtual function to perform the forward pass of the DFL layer.
+     * @brief Performs the forward pass of the DFL layer.
      * 
-     * This function must be implemented by derived classes, such as DFLCPU or DFLGPU,
-     * which are specific to the execution device (e.g., CPU or GPU). 
+     * This function executes the DFL operation by coordinating the sub-layers:
+     * first transposing the input boxes, then applying softmax, and finally
+     * performing matrix multiplication with the learned weights.
      */
-    virtual void Forward() = 0;
+    void Forward();
 
     /**
-     * @brief Pure virtual function to apply the softmax operation for the DFL layer.
-     * 
-     * This function must be implemented by derived classes, such as DFLCPU or DFLGPU,
-     * which are specific to the execution device (e.g., CPU or GPU).
-     * The softmax operation is applied to the provided tensor to normalize values.
-     * 
-     * @param tensor A reference to the tensor on which to apply the softmax operation.
+     * @brief Returns the output tensor of the DFL layer.
      */
-    virtual void DFLSoftmax(Tensor<T>& tensor) = 0;
+    inline Tensor<T>* GetOutputTensor() override { return matmul_->GetOutputTensor(); }
 
   protected:
-    /**
-     * @brief Initializes the DFL layer with parameters from a TorchConv2d object.
-     * 
-     * This function sets up the DFL layer by configuring the weight tensor without bias.
-     * 
-     * @param conv2d_params The TorchConv2d object containing the convolution parameters.
-     */
-    void DFLSetup(const TorchConv2d& conv2d_params);
-
     std::unique_ptr<Tensor<T>> weight_; // Unique pointer to the weight tensor for the layer
     size_t in_channels_;                // Number of input channels
     size_t out_channels_;               // Number of output channels (1x1 convolution)
@@ -79,6 +86,8 @@ class DFL : public HiddenLayerAbstract<T> {
     size_t output_width_;               // Width of the output tensor
 
     std::unique_ptr<Transpose<T>> trans_boxes_;
+    std::unique_ptr<Softmax<T>> softmax_;
+    std::unique_ptr<MatMul<T>> matmul_;
 };
 
 } // namespace oris_ai
