@@ -1,10 +1,27 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
-#include "oris_ai/layer/layer.h"
+#include "oris_ai/layer/base_convolution.h"
 
 namespace oris_ai {
 
@@ -18,24 +35,14 @@ namespace oris_ai {
  * @tparam T The data type for the layer operations (e.g., float).
  */
 template <typename T>
-class Convolution : public HiddenLayerAbstract<T> {
+class Convolution : public BaseConvolution<T> {
   public:
     /**
-     * @brief Constructor to initialize a Convolution layer without layer_name.
-     */
-    Convolution()
-      : HiddenLayerAbstract<T>(),
-        activation_type_(ActivationType::NONE), 
-        is_1x1_conv_(false) {}
-        
-    /**
-     * @brief Constructor to initialize a Convolution layer with layer_name.
+     * @brief Constructor to initialize a Convolution layer.
      * @param name The name of the layer.
      */
-    Convolution(const std::string& layer_name) 
-      : HiddenLayerAbstract<T>(layer_name), 
-        activation_type_(ActivationType::NONE), 
-        is_1x1_conv_(false) {}
+    Convolution(const std::string& layer_name)
+      : BaseConvolution<T>(layer_name) {}
 
     /**
      * @brief Destructor for the Convolution class.
@@ -71,31 +78,6 @@ class Convolution : public HiddenLayerAbstract<T> {
     virtual void InitConvolution(const TorchConv2d& conv2d_params) = 0;
 
     /**
-     * @brief Sets the activation function for the convolution layer.
-     * 
-     * This function defines the activation function to be applied after the convolution operation.It sets the activation type (e.g., ReLU, SiLU) and related parameters for the layer.
-     * 
-     * @param act The TorchActivation object containing the activation type and its parameters.
-     */
-    void SetActivation(const TorchActivation& act);
-
-    /**
-     * @brief Gets the weight tensor for the convolution layer.
-     * 
-     * @return A pointer to the weight tensor.
-     */
-    inline Tensor<T>* GetWeight() { return weight_.get(); }
-
-    /**
-     * @brief Gets the bias tensor for the convolution layer, if available.
-     * 
-     * @return A pointer to the bias tensor, or nullptr if no bias is present.
-     */
-    inline Tensor<T>* GetBias() {
-      return bias_ ? bias_.get() : nullptr;
-    }
-
-    /**
      * @brief Pure virtual function to perform the forward pass of the convolution layer.
      * 
      * This function must be implemented by derived classes, which are specific
@@ -128,18 +110,7 @@ class Convolution : public HiddenLayerAbstract<T> {
      */
     void ConvolutionSetup(const TorchConv2d& conv2d_params);
 
-    ActivationType activation_type_;    // The type of activation function used in the layer.
-    std::unique_ptr<Tensor<T>> weight_; // A unique pointer to the weight tensor for the layer.
-    std::unique_ptr<Tensor<T>> bias_;   // A unique pointer to the bias tensor, if applicable.
-    std::unique_ptr<Tensor<T>> im2col_buffer_; // A unique pointer to the buffer used for im2col operations.
-
-    size_t out_channels_, in_channels_;   // The number of output and input channels for the layer.
-    size_t kernel_h_, kernel_w_;          // The height and width of the convolution kernel.
-    size_t stride_h_, stride_w_;          // The stride along the height and width dimensions.
-    size_t padding_h_, padding_w_;        // The padding size for the height and width dimensions.
-    size_t output_height_, output_width_; // The height and width of the output tensor.
-
-    bool is_1x1_conv_;  // Flag indicating whether this is a 1x1 convolution (special optimization case).
+    size_t out_channels_;   // The number of output channels for the layer.
 };
 
 } // namespace oris_ai

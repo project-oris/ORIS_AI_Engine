@@ -3,13 +3,15 @@ ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-d
 
 ## 1. Supported Layer
  - Input: OpenCV Mat
- - CNN: Concat, Convolution, MaxPooling, Split, Transpose
+ - Common: Concat, Convolution, Depthwise Convolution, ElementWise (SUM), MatMul, MaxPooling, Softmax. Split, Transpose
  - Activation: SiLU
- - Custom (for Yolo v8): C2f, BottleNeck (for C2f), DFL, SPPF
- - Output (for Yolo v8): Detect 
+ - Custom (for YOLO v8): C2f,BottleNeck (for C2f/C3k), DFL, SPPF, Proto
+ - Custom (for YOLO v11): C3k, C3k2, C2PSA, PSABlock, Attention
+ - Output (for YOLO v8/v11): Detect, Segment
 
 ## 2. Supported DNN
- - Detection: Yolo v8
+ - Detection: YOLO v8/v11
+ - Segmentation: YOLO v8/v11
 
 ## 3. Requirements
 
@@ -48,7 +50,7 @@ $ sudo apt-get install libeigen3-dev
 
 ### 4-3. protobuf
 ```
-$ sudo apt-get install libprotobuf-dev
+$ sudo apt-get install libprotobuf-dev protobuf-compiler
 ```
 
 ### 4-4. glog
@@ -85,40 +87,34 @@ $ echo $OPENBLAS_NUM_THREADS
 ```
 
 ### 4-6. OpenCV
-#### 4-6-1. Install prerequisites for openCV
-```
-$ sudo apt-get install build-essential
-$ sudo apt-get install libjpeg-dev libtiff5-dev libpng-dev
-$ sudo apt-get install ffmpeg libavcodec-dev libavformat-dev libswscale-dev libxvidcore-dev libx264-dev libxine2-dev
-$ sudo apt-get install libv4l-dev v4l-utils
-$ sudo apt-get install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
-$ sudo apt-get install libgtk-3-dev
-$ sudo apt-get install libatlas-base-dev gfortran libeigen3-dev
-$ sudo apt-get install python3-dev python3-numpy
-```
+
+#### 📢 Notice on GPL License
+OpenCV itself is released under the **BSD 3-Clause License**.  
+However, when building or installing OpenCV, additional external libraries may introduce **GPL obligations**.  
+
+- If GPL-related libraries such as `libx264-dev` or `libxvidcore-dev` are included, the resulting OpenCV build may be subject to the **GPL license**, requiring source code disclosure when redistributed.  
+- When enabling `WITH_FFMPEG=ON`, please check whether your FFmpeg installation is built in **LGPL-only mode** or whether it links to **GPL codecs** (e.g., x264).  
+- The option `OPENCV_ENABLE_NONFREE=ON` enables patented algorithms and should remain **OFF** unless you have verified that your use case allows it.  
+
+📌 **Important**  
+- For **personal or research use**, GPL obligations are generally not an issue.  
+- For **distribution, commercial use, or providing binaries externally**, you must **verify whether GPL libraries are linked** and, if so, ensure **full compliance with the GPL license**.  
+- If you want to avoid GPL obligations, build OpenCV **without GPL-related libraries** and rely only on **BSD/LGPL components**.  
+
+---
+
+#### 4-6-1. Install prerequisites
+Install only the required dependencies for your environment. Avoid GPL-related packages if you want to distribute without GPL obligations.
 
 #### 4-6-2. Build OpenCV
-```
-$ git clone https://github.com/opencv/opencv.git {OpenCV_Path}
-$ cd {OpenCV_Path}
-$ mkdir build && cd build
-$ cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
--D WITH_CUDA=OFF -D WITH_CUBLAS=OFF -D WITH_CUFFT=OFF -D WITH_MATLAB=OFF \
--D WITH_IPP=OFF -D WITH_1394=OFF -D WITH_OPENCLAMDBLAS=OFF -D WITH_OPENCLAMDFFT=OFF \
--D WITH_TBB=OFF -D WITH_XINE=OFF \
--D INSTALL_C_EXAMPLES=OFF -D INSTALL_PYTHON_EXAMPLES=OFF -D BUILD_EXAMPLES=OFF \
--D BUILD_TESTS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_WITH_DEBUG_INFO=OFF -D BUILD_DOCS=OFF ..
-$ make -j$(nproc)
-$ make install
-$ sudo ldconfig
-```
+Use the appropriate build options for your environment. By default, it is recommended to set `WITH_FFMPEG=OFF` and `OPENCV_ENABLE_NONFREE=OFF`.
 
 ## 5. How to compile ORIS_AI
-The installation path of ORIS_AI (currently {ORIS_AI_OSS_PATH}) needs to be modified to suit your environment.
+The installation path of ORIS_AI (currently `/ORIS_AI`) needs to be modified to suit your environment.
 
 ### 5-1. Native compile
 ```
-$ cd {ORIS_AI_OSS_PATH}
+$ cd /ORIS_AI
 $ mkdir build
 $ cd build
 $ cmake ..
@@ -128,144 +124,45 @@ $ make -j$(nproc)
 ### 5-2. Cmake configuration
 Use `ccmake`
 ```
-$ cd {ORIS_AI_OSS_PATH}/build
+$ cd /ORIS_AI/build
 $ ccmake ..
 ```
 
 ## 6. How to run ORIS_AI
 The source codes of example are located in the following path.
 ```
-{ORIS_AI_OSS_PATH}/src/oris_ai/examples
+/ORIS_AI/src/oris_ai/examples
 ```
 
 The binaries of example are located in the following path.
 ```
-{ORIS_AI_OSS_PATH}/build/bin
+/ORIS_AI/build/bin
 ```
 
 ## 7. Example
 
-### 7-1. Basic Tensor Operation
-{ORIS_AI_OSS_PATH}/src/oris_ai/examples/test_tensor_basic.cc
+When using GPU, the ORIS AI inference engine is executed as an asynchronous stream, and when using CUDA, if you want to measure the actual execution time of each step, you must use the sync option.
+
+#### 7-1. Yolov8 Official Model
+- /ORIS_AI/src/oris_ai/examples/test_yolo_v8.cc
 ```
-int main(int argc, char** argv) {
-  // Creates a 3D tensor with dimensions 4x4x4.
-  // If the second argument to Tensor() is not set to cpu_only=true,
-  // both CPU and GPU can be used.
-  std::vector<size_t> shape = {4, 4, 4};
-  oris_ai::Tensor<float> tensor(shape);
-
-  // Checks and prints the shape of the tensor.
-  std::cout << "Tensor shape: ";
-  const std::vector<size_t>& tensor_shape = tensor.Shape();
-  for (size_t dim : tensor_shape) {
-      std::cout << dim << " ";
-  }
-  std::cout << std::endl;
-
-  // Initializes all values in the tensor to 1.0 (in CPU memory).
-  std::cout << "Set CPU Data" << std::endl;
-  tensor.SetCPUData(1.0f);
-
-  // Copies data from CPU to GPU.
-  std::cout << "Tensor To GPU" << std::endl;
-  tensor.To(oris_ai::Device::GPU);
-
-  // Retrieves data from the GPU and checks the value at position (2, 3, 1).
-  std::vector<size_t> indices = {2, 3, 1};
-  std::cout << "Get GPU Data" << std::endl;
-  float& value = tensor.GetCPUData(indices); // Copies the data from GPU to CPU and references it.
-
-  // Prints the current value at position (2, 3, 1).
-  std::cout << "The value at (2, 3, 1) is: " << value << std::endl;
-
-  // Modifies the value at position (2, 3, 1) to 5.0.
-  std::cout << "New value = 5" << std::endl;
-  value = 5.0f;
-
-  // Reflects the modified value back to the GPU (copies data from CPU to GPU).
-  std::cout << "Tensor To GPU" << std::endl;
-  tensor.To(oris_ai::Device::GPU);
-
-  // Checks the value again at position (2, 3, 1) from the GPU and copies it back to the CPU.
-  std::cout << "Tensor To CPU" << std::endl;
-  tensor.To(oris_ai::Device::CPU);  // Copies data back to CPU
-  std::cout << "The modified value at (2, 3, 1) is: " << tensor.GetCPUData(indices) << std::endl;
-
-  return 0;
-}
+Usage: ./test_yolo_v8 [OPTIONS]
+Options:
+  -c      Use CPU for inference. Default is GPU.
+  -sync   Synchronize CUDA before timing. (For accurate GPU timing)
+Example:
+  ./test_yolo_v8 -c
+  ./test_yolo_v8 -sync
 ```
 
-### 7-2. Premute Tensor
-{ORIS_AI_OSS_PATH}/src/oris_ai/examples/test_tensor_permute.cc
+#### 7-2. Yolov11 Official Model
+- /ORIS_AI/src/oris_ai/examples/test_yolo_v11.cc
 ```
-int main(int argc, char** argv) {
-    // Creates a 3D tensor with dimensions 2x3x4.
-    // Set the second argument of Tensor() to cpu_only=true to use CPU only.
-    std::vector<size_t> shape = {2, 3, 4};
-    oris_ai::Tensor<float> tensor(shape, true); // CPU only
-
-    // Checks and prints the shape of the tensor.
-    std::cout << "Tensor shape: ";
-    const std::vector<size_t>& tensor_shape = tensor.Shape();
-    for (size_t dim : tensor_shape) {
-        std::cout << dim << " ";
-    }
-    std::cout << std::endl;
-
-    // Initializes all values in the tensor to 1.0 (in CPU memory).
-    std::cout << "Set CPU Data" << std::endl;
-    tensor.SetCPUData(1.0f);
-
-    // Prints all initialized values.
-    std::cout << "Initial tensor values:" << std::endl;
-    for (size_t i = 0; i < shape[0]; ++i) {
-        for (size_t j = 0; j < shape[1]; ++j) {
-            for (size_t k = 0; k < shape[2]; ++k) {
-                std::vector<size_t> idx = {i, j, k};
-                std::cout << "tensor[" << i << "][" << j << "][" << k << "] = " 
-                          << tensor.GetCPUData(idx) << std::endl;
-            }
-        }
-    }
-
-    // Permutes the dimensions of the tensor (e.g., in the order of (0, 2, 1)).
-    std::cout << "Permuting tensor dimensions..." << std::endl;
-    std::vector<size_t> new_order = {0, 2, 1};
-    tensor.Permute(new_order);
-
-    // Checks and prints the shape of the permuted tensor.
-    std::cout << "Permuted tensor shape: ";
-    const std::vector<size_t>& permuted_shape = tensor.Shape();
-    for (size_t dim : permuted_shape) {
-        std::cout << dim << " ";
-    }
-    std::cout << std::endl;
-
-    // Prints the data of the permuted tensor.
-    std::cout << "Permuted tensor values:" << std::endl;
-    for (size_t i = 0; i < permuted_shape[0]; ++i) {
-        for (size_t j = 0; j < permuted_shape[1]; ++j) {
-            for (size_t k = 0; k < permuted_shape[2]; ++k) {
-                std::vector<size_t> idx = {i, j, k};
-                std::cout << "permuted_tensor[" << i << "][" << j << "][" << k << "] = " 
-                          << tensor.GetCPUData(idx) << std::endl;
-            }
-        }
-    }
-
-    return 0;
-}
+Usage: ./test_yolo_v11 [OPTIONS]
+Options:
+  -c      Use CPU for inference. Default is GPU.
+  -sync   Synchronize CUDA before timing. (For accurate GPU timing)
+Example:
+  ./test_yolo_v11 -c
+  ./test_yolo_v11 -sync
 ```
-
-## 8. Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. Please make sure to update tests as appropriate.
-
-## 9. Authors
-Seungtae Hong - sthong@etri.re.kr
-
-## 10. Acknowledgment
-This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) grant funded by the Korea government(MSIT) (No. RS-2024-00339187, Core Technology Development of On-device Robot Intelligence SW Platform)
-
-## 11.License
-Distributed under the MIT License.

@@ -1,7 +1,24 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
 #include "oris_ai/layer/convolution.h"
@@ -24,21 +41,30 @@ template <typename T>
 class ConvolutionGPU : public Convolution<T> {
   public:
     /**
-     * @brief Constructor to initialize a ConvolutionGPU layer without layer_name.
-     */
-    ConvolutionGPU() : Convolution<T>(), work_space_(nullptr), size_work_space_(0) {}
-
-    /**
-     * @brief Constructor to initialize a ConvolutionGPU layer with layer_name.
+     * @brief Constructor to initialize a ConvolutionGPU layer.
      * @param name The name of the layer.
      */
-    ConvolutionGPU(const std::string& layer_name) : Convolution<T>(layer_name), work_space_(nullptr), size_work_space_(0) {}
+    ConvolutionGPU(const std::string& layer_name)
+      : Convolution<T>(layer_name),
+        work_space_(nullptr),
+        size_work_space_(0) {}
 
     /**
      * @brief Destructor for the ConvolutionGPU class.
      */
     ~ConvolutionGPU();
 
+    /**
+     * @brief Overrides the virtual InitConvolution function for NVIDIA GPU-specific
+     * initialization with activation.
+     * 
+     * This function implements the virtual InitConvolution method defined in the Convolution 
+     * base class, configuring the convolution layer with the provided parameters and activation function for
+     * efficient execution on the NVIDIA GPU.
+     * 
+     * @param conv2d_params The TorchConv2d object containing convolution parameters.
+     * @param act The TorchActivation object containing activation function parameters.
+     */
     void InitConvolution(const TorchConv2d& conv2d_params, const TorchActivation& act) override;
 
     /**
@@ -70,6 +96,7 @@ class ConvolutionGPU : public Convolution<T> {
     cudnnFilterDescriptor_t filter_desc_;
     cudnnConvolutionDescriptor_t conv_desc_;
     cudnnTensorDescriptor_t bias_desc_;
+    // cudnnActivationDescriptor_t act_desc_;
     void* work_space_;
     size_t size_work_space_;
 

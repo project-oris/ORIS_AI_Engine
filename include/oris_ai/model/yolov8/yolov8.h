@@ -1,20 +1,39 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
 #include "oris_ai/layer/layer_factory.h"
 #include "oris_ai/model/model.h"
+#include "oris_ai/model/task_type.h"
 
 namespace oris_ai {
 
-class Yolov8 : public Model {
+template<typename T>
+class Yolov8 : public Model<T> {
   public:
     /**
      * @brief Constructor to initialize Yolov8n model.
      */
-    Yolov8(Device target_device) : Model("yolov8n", target_device) {}
+    Yolov8(Device target_device, TaskType task_type);
 
     /**
      * @brief Destructor for Yolov8n model.
@@ -22,39 +41,30 @@ class Yolov8 : public Model {
     ~Yolov8() = default;
 
     /**
-     * @brief Opens the YOLOv8n model
-     * 
-     * @param model_path The path to the model file.
-     */
-    void Open(const std::string& model_path) override;
-
-    /**
-     * @brief Opens the model from an array
-     * 
-     * @param model_data Pointer to the binary model data.
-     * @param model_size Size of the binary model data in bytes.
-     */
-    void OpenFromArray(const unsigned char* model_data, size_t model_size) override;
-
-    /**
      * @brief Executes a forward pass through the Yolov8 model.
      *
      * This function processes the input tensors by passing them sequentially 
      * through each layer in the Yolov8 model.
      */
-    void Forward();
+    void Forward() override;
 
     /**
-     * @brief Applies Non-Maximum Suppression (NMS) to filter detection results.
+     * @brief Performs post-processing on YOLOv8 model outputs.
      *
-     * This function performs Non-Maximum Suppression to eliminate overlapping 
-     * bounding boxes based on their confidence scores and IoU thresholds.
+     * This function applies task-specific post-processing operations based on the model type:
+     * - For Detection: Applies Non-Maximum Suppression to filter overlapping boxes
+     * - For Segmentation: Performs both NMS and mask coefficient filtering
      *
-     * @param score_threshold Minimum confidence score for a detection to be considered valid. Default is 0.25.
-     * @param iou_threshold Intersection over Union (IoU) threshold for suppression. Default is 0.45.
-     * @param max_det Maximum number of detections to keep after suppression. Default is 300.
+     * @param score_threshold Minimum confidence score for a detection to be considered valid.
+     * Default is 0.25.
+     * @param iou_threshold Intersection over Union (IoU) threshold for suppression.
+     * Default is 0.45.
+     * @param max_det Maximum number of detections to keep after post-processing.
+     * Default is 300.
      */
-    void NonMaxSuppression(float score_threshold = 0.25f, float iou_threshold = 0.45f, int max_det = 300);
+    void PostProcess(float score_threshold = 0.25f,
+                    float iou_threshold = 0.45f,
+                    int max_det = 300) override;
 
     /**
      * @brief Retrieves the detection results from the Yolov8 model.
@@ -65,43 +75,73 @@ class Yolov8 : public Model {
      * @return A const reference to a vector of Detection objects representing 
      *         the results of the detection process.
      */
-    inline const std::vector<Detection>& GetResult() const override {
-      return model_22_detect_->GetDetectionResult();
+    inline const std::vector<Detection>& GetDetectionResults() const override {
+      if (task_type_ == TaskType::Detection) {
+        return model_detect_->GetDetection();
+      } else {
+        return model_segment_->GetDetection();
+      }
     }
 
+    /**
+     * @brief Retrieves the segmentation mask from the YOLOv8 model.
+     *
+     * This function returns a vector of float values representing the
+     * segmentation mask generated by the model. The mask contains pixel-wise
+     * classification scores for each class in the segmentation task.
+     *
+     * @return A const reference to a vector of float values representing
+     *         the segmentation mask.
+     */
+    inline const std::vector<float>& GetSegmentationMask() const override {
+      return model_segment_->GetMask();
+    }
+
+  protected:
+    TaskType task_type_;
+    std::unique_ptr<YoloDetect<T>> model_detect_;
+
+    /**
+     * @brief Parses the YOLOv8 model from a TorchModel object.
+     * 
+     * This function processes the parsed TorchModel object and initializes
+     * the YOLOv8 model's internal structures and parameters. It sets up the
+     * backbone and head layers of the YOLOv8 model.
+     * 
+     * @param model The TorchModel object containing the YOLOv8 model data.
+     * @return true if parsing is successful, false otherwise.
+     */
+    bool ParsingModel(oris_ai::TorchModel& model) override;
+    
+    /**
+     * @brief Creates and initializes a Convolution layer.
+     * 
+     * This function creates a Convolution layer with the specified parameters
+     * and initializes it with the given input tensor and device.
+     * 
+     * @param index Reference to the current layer index in the model.
+     * @param model The TorchModel object containing the layer parameters.
+     * @param input_tensor Pointer to the input tensor for the convolution layer.
+     * @param device The target device (CPU or GPU) for the layer.
+     */
+    void MakeConv(int& index, const TorchModel& model, Tensor<T>* input_tensor, const Device& device);
+
+    /**
+     * @brief Sets up the layers required for the detection head.
+     * 
+     * This function prepares the TorchLayer objects needed for initializing
+     * the detection head of the YOLOv8 model, including the feature map
+     * processing layers and the DFL (Distribution Focal Loss) layer.
+     * 
+     * @param model The TorchModel object containing the layer parameters.
+     * @param torch_layers Vector to store the prepared TorchLayer objects.
+     * @param index Reference to the current layer index in the model.
+     */
+    // Utility helpers defined in yolov8_helper.cc are used to configure
+    // detection and segmentation heads. No class-specific helpers are needed.
+
   private:
-    void ParsingYolov8(oris_ai::TorchModel& model);
-    bool ParsingModel(std::fstream& input);
-    bool ParsingModel(std::istream& input);
-    void MakeConv(int& index, const TorchModel& model, Tensor<float>* input_tensor, const Device& device);
-    void SetC2fLayers(const oris_ai::TorchModel& model, std::vector<TorchLayer>& torch_layers, int& index, int bottleneck_count);
-    void SetSPPFLayers(const oris_ai::TorchModel& model, std::vector<TorchLayer>& torch_layers, int& index);
-    void SetDetectLayers(const oris_ai::TorchModel& model, std::vector<TorchLayer>& torch_layers, int& index);
-
-    std::unique_ptr<Convolution<float>> model_0_conv_;
-    std::unique_ptr<Convolution<float>> model_1_conv_;
-    std::unique_ptr<C2f<float>> model_2_c2f_;
-    std::unique_ptr<Convolution<float>> model_3_conv_;
-    std::unique_ptr<C2f<float>> model_4_c2f_;
-    std::unique_ptr<Convolution<float>> model_5_conv_;
-    std::unique_ptr<C2f<float>> model_6_c2f_;
-    std::unique_ptr<Convolution<float>> model_7_conv_;
-    std::unique_ptr<C2f<float>> model_8_c2f_;
-    std::unique_ptr<SPPF<float>> model_9_sppf_;
-    std::unique_ptr<Upsample<float>> model_10_upsample_;
-    std::unique_ptr<Concat<float>> model_11_concat_;
-    std::unique_ptr<C2f<float>> model_12_c2f_;
-    std::unique_ptr<Upsample<float>> model_13_upsample_;
-    std::unique_ptr<Concat<float>> model_14_concat_;
-    std::unique_ptr<C2f<float>> model_15_c2f_;
-    std::unique_ptr<Convolution<float>> model_16_conv_;
-    std::unique_ptr<Concat<float>> model_17_concat_;
-    std::unique_ptr<C2f<float>> model_18_c2f_;
-    std::unique_ptr<Convolution<float>> model_19_conv_;
-    std::unique_ptr<Concat<float>> model_20_concat_;
-    std::unique_ptr<C2f<float>> model_21_c2f_;
-
-    std::unique_ptr<Yolov8Detect<float>> model_22_detect_;
+    std::unique_ptr<YoloSegment<T>> model_segment_;
 };
 
 }  // namespace oris_ai

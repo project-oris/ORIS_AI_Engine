@@ -1,7 +1,24 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
 #include "oris_ai/layer/layer.h"
@@ -21,15 +38,11 @@ template <typename T>
 class Transpose : public HiddenLayerAbstract<T> {
   public:
     /**
-     * @brief Default constructor to initialize a transpose layer without layer_name.
+     * @brief Default constructor to initialize a transpose layer.
+     * @param layer_name The name of the layer. 
      */
-    Transpose() : HiddenLayerAbstract<T>() {}
-
-    /**
-     * @brief Constructor to initialize a transpose layer with a specified layer_name.
-     * @param layer_name The name of the layer.
-     */
-    // Transpose(const std::string& layer_name) : HiddenLayerAbstract<T>(layer_name) {}
+    Transpose(const std::string& layer_name)
+      : HiddenLayerAbstract<T>(layer_name) {}
 
     /**
      * @brief Destructor for the Transpose class.
@@ -74,7 +87,7 @@ class Transpose : public HiddenLayerAbstract<T> {
      */
     void TransposeSetup(size_t dim1, size_t dim2, bool use_view_input_shape = false);
 
-    std::vector<size_t> transposed_index_;  // Precomputed indices for transposed tensor
+    std::vector<int> transposed_index_;  // Precomputed indices for transposed tensor
 };
 
 } // namespace oris_ai

@@ -1,7 +1,24 @@
-/****************************************************************************** 
-// Copyright 2024 Electronics and Telecommunications Research Institute (ETRI).
-// All Rights Reserved.
-******************************************************************************/
+/*******************************************************************************
+ * Copyright (c) 2024 Electronics and Telecommunications Research Institute (ETRI)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *******************************************************************************/
 #pragma once
 
 #include "oris_ai/layer/convolution.h"
@@ -23,15 +40,12 @@ template <typename T>
 class ConvolutionCPU : public Convolution<T> {
   public:
     /**
-     * @brief Constructor to initialize a ConvolutionCPU layer without layer_name.
-     */
-    ConvolutionCPU() : Convolution<T>() {}
-
-    /**
-     * @brief Constructor to initialize a ConvolutionCPU layer with layer_name.
+     * @brief Constructor to initialize a ConvolutionCPU layer.
      * @param name The name of the layer.
      */
-    ConvolutionCPU(const std::string& layer_name) : Convolution<T>(layer_name) {}
+    ConvolutionCPU(const std::string& layer_name)
+      : Convolution<T>(layer_name),
+        is_1x1_conv_(false) {}
 
     /**
      * @brief Destructor for the ConvolutionCPU class.
@@ -61,6 +75,16 @@ class ConvolutionCPU : public Convolution<T> {
 
   private:
     /**
+     * @brief Configures the im2col buffer for the convolution layer.
+     * 
+     * This function initializes the im2col buffer for the convolution layer, which is used 
+     * to store the intermediate results of the convolution operation.
+     * 
+     * @param conv2d_params The TorchConv2d object containing the parameters.
+     */
+    void SetIm2Col(const TorchConv2d& conv2d_params);
+
+    /**
      * @brief Performs the im2col operation for convolution.
      * 
      * The im2col (image to column) operation is used to transform the input data 
@@ -80,6 +104,9 @@ class ConvolutionCPU : public Convolution<T> {
     void Im2Col(const T* input_data, T* col_data, int input_h, int input_w,
                 int kernel_h, int kernel_w, int pad_h, int pad_w,
                 int stride_h, int stride_w);
+
+    std::unique_ptr<Tensor<T>> im2col_buffer_; // A unique pointer to the buffer used for im2col operations.
+    bool is_1x1_conv_;  // Flag indicating whether this is a 1x1 convolution (special optimization case).
 };
 
 } // namespace oris_ai
