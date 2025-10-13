@@ -22,13 +22,13 @@
 #pragma once
 
 #include "oris_ai/layer/layer_factory.h"
-#include "oris_ai/model/model.h"
+#include "oris_ai/model/yolo_base.h"
 #include "oris_ai/model/task_type.h"
 
 namespace oris_ai {
 
 template<typename T>
-class Yolov8 : public Model<T> {
+class Yolov8 : public YoloBase<T> {
   public:
     /**
      * @brief Constructor to initialize Yolov8n model.
@@ -103,42 +103,15 @@ class Yolov8 : public Model<T> {
 
     /**
      * @brief Parses the YOLOv8 model from a TorchModel object.
-     * 
+     *
      * This function processes the parsed TorchModel object and initializes
      * the YOLOv8 model's internal structures and parameters. It sets up the
      * backbone and head layers of the YOLOv8 model.
-     * 
+     *
      * @param model The TorchModel object containing the YOLOv8 model data.
      * @return true if parsing is successful, false otherwise.
      */
     bool ParsingModel(oris_ai::TorchModel& model) override;
-    
-    /**
-     * @brief Creates and initializes a Convolution layer.
-     * 
-     * This function creates a Convolution layer with the specified parameters
-     * and initializes it with the given input tensor and device.
-     * 
-     * @param index Reference to the current layer index in the model.
-     * @param model The TorchModel object containing the layer parameters.
-     * @param input_tensor Pointer to the input tensor for the convolution layer.
-     * @param device The target device (CPU or GPU) for the layer.
-     */
-    void MakeConv(int& index, const TorchModel& model, Tensor<T>* input_tensor, const Device& device);
-
-    /**
-     * @brief Sets up the layers required for the detection head.
-     * 
-     * This function prepares the TorchLayer objects needed for initializing
-     * the detection head of the YOLOv8 model, including the feature map
-     * processing layers and the DFL (Distribution Focal Loss) layer.
-     * 
-     * @param model The TorchModel object containing the layer parameters.
-     * @param torch_layers Vector to store the prepared TorchLayer objects.
-     * @param index Reference to the current layer index in the model.
-     */
-    // Utility helpers defined in yolov8_helper.cc are used to configure
-    // detection and segmentation heads. No class-specific helpers are needed.
 
   private:
     std::unique_ptr<YoloSegment<T>> model_segment_;
