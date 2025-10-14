@@ -79,30 +79,13 @@ class Model {
      * @brief Converts and sets an input image as a tensor in NCHW format with normalization.
      * This function automatically selects CPU or GPU processing based on the target device.
      *
-     * @param input_image The input image as a `cv::Mat` object. It must be a valid 3-channel
-     * image matrix in BGR format by default.
-     */
-    void SetInputImageTensor(const cv::Mat& input_image);
-
-    /**
-     * @brief Converts and sets an input image as a tensor in NCHW format with normalization.
-     * This function processes an input image in OpenCV's `cv::Mat` format and prepares it for
-     * use as a model input using CPU-based processing.
+     * Preprocessing is model-specific and must be implemented by derived classes.
+     * For example, YOLO models normalize by 255, while ImageNet models may use mean/std normalization.
      *
      * @param input_image The input image as a `cv::Mat` object. It must be a valid 3-channel
      * image matrix in BGR format by default.
      */
-    void SetInputImageTensorCPU(const cv::Mat& input_image);
-
-    /**
-     * @brief Converts and sets an input image as a tensor in NCHW format with normalization.
-     * This function processes an input image in OpenCV's `cv::Mat` format and prepares it for
-     * use as a model input using GPU-based processing.
-     *
-     * @param input_image The input image as a `cv::Mat` object. It must be a valid 3-channel
-     * image matrix in BGR format by default.
-     */
-    void SetInputImageTensorGPU(const cv::Mat& input_image);
+    virtual void SetInputImageTensor(const cv::Mat& input_image) = 0;
 
     /**
      * @brief Parses the model from a TorchModel object.
