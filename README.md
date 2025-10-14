@@ -1,7 +1,7 @@
 # ORIS_AI
 ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-device Robot Intelligence SW-System) project.
 
-## 1. Supported Layer
+## 1. Supported Layers
  - Input: OpenCV Mat
  - Common: Concat, Convolution, Depthwise Convolution, ElementWise (SUM), MatMul, MaxPooling, Softmax. Split, Transpose
  - Activation: SiLU
@@ -9,7 +9,7 @@ ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-d
  - Custom (for YOLO v11): C3k, C3k2, C2PSA, PSABlock, Attention
  - Output (for YOLO v8/v11): Detect, Segment
 
-## 2. Supported DNN
+## 2. Supported DNNs
  - Detection: YOLO v8/v11
  - Segmentation: YOLO v8/v11
 
@@ -19,9 +19,9 @@ Component | Recommended version | Command to check the version
 --------- | --------------- | ----------------------------
 Ubuntu | 22.04 | lsb_release -a
 gcc/g++ | 11.4.0 | gcc --version
-cmake | 3.30.2 | cmake --version
-cudatoolkit | 12.1 | nvcc --version
-cudnn | 9.1 | cat {Your CUDNN Install Path}/cudnn_version.h | grep CUDNN_MAJOR -A 2
+cmake | 3.22.1 | cmake --version
+cudatoolkit | 12.6 | nvcc --version
+cudnn | 9.3 | cat {Your CUDNN Install Path}/cudnn_version.h | grep CUDNN_MAJOR -A 2
 opencv | 4.8
 protobuf | 3.12.4 | protoc --version
 
@@ -126,6 +126,13 @@ Use `ccmake`
 ```
 $ cd /ORIS_AI/build
 $ ccmake ..
+```
+
+### 5.3. Configure the library path
+Create symbolic links for the shared libraries to `/usr/local/lib`.
+```
+$ sudo ln -s {ORIS_AI_Path}/lib/aarch_64/libORISCore.so /usr/local/lib/libORISCore.so
+$ sudo ln -s {ORIS_AI_Path}/lib/aarch_64/libORISCUDA.so /usr/local/lib/libORISCUDA.so
 ```
 
 ## 6. How to run ORIS_AI
