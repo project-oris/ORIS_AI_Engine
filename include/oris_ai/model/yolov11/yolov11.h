@@ -22,13 +22,13 @@
 #pragma once
 
 #include "oris_ai/layer/layer_factory.h"
-#include "oris_ai/model/model.h"
+#include "oris_ai/model/yolo_base.h"
 #include "oris_ai/model/task_type.h"
 
 namespace oris_ai {
 
 template<typename T>
-class Yolov11 : public Model<T> {
+class Yolov11 : public YoloBase<T> {
   public:
     /**
      * @brief Constructor to initialize Yolov11 model.
@@ -100,17 +100,6 @@ class Yolov11 : public Model<T> {
      * @return true if parsing is successful, false otherwise.
      */
     bool ParsingModel(oris_ai::TorchModel& model) override;
-
-    /**
-     * @brief Creates and initializes a Convolution layer.
-     *
-     * @param index Reference to the current layer index in the model.
-     * @param model The TorchModel object containing the layer parameters.
-     * @param input_tensor Pointer to the input tensor for the convolution layer.
-     * @param device The target device (CPU or GPU) for the layer.
-     */
-    void MakeConv(int& index, const TorchModel& model, Tensor<T>* input_tensor,
-                  const Device& device);
 
   private:
     TaskType task_type_;
