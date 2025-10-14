@@ -15,14 +15,18 @@ ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-d
 
 ## 3. Requirements
 
+- The command `dpkg -l | grep nvidia-l4t-core` outputs the version of the `nvidia-l4t-core` package (for example, `nvidia-l4t-core 36.4.4-xxxxxxxxxxxxxx`) rather than the JetPack label itself.
+- The `36.4.4` component maps to JetPack 6.2.1, so the JetPack version is inferred from this package version.
+
+
 Component | Recommended version | Command to check the version
 --------- | --------------- | ----------------------------
-Ubuntu | 22.04 | lsb_release -a
+JetPack | 6.2.1 | `dpkg -l \| grep nvidia-l4t-core`
 gcc/g++ | 11.4.0 | gcc --version
-cmake | 3.22.1 | cmake --version
+cmake | ≥ 3.22.1 | cmake --version
 cudatoolkit | 12.6 | nvcc --version
 cudnn | 9.3 | cat {Your CUDNN Install Path}/cudnn_version.h | grep CUDNN_MAJOR -A 2
-opencv | 4.8
+opencv | 4.8 | python3 -c "import cv2; print(cv2.__version__)"
 protobuf | 3.12.4 | protoc --version
 
 ## 4. Prerequisites
@@ -131,8 +135,8 @@ $ ccmake ..
 ### 5.3. Configure the library path
 Create symbolic links for the shared libraries to `/usr/local/lib`.
 ```
-$ sudo ln -s {ORIS_AI_Path}/lib/aarch_64/libORISCore.so /usr/local/lib/libORISCore.so
-$ sudo ln -s {ORIS_AI_Path}/lib/aarch_64/libORISCUDA.so /usr/local/lib/libORISCUDA.so
+$ sudo ln -s /ORIS_AI/lib/aarch_64/libORISCore.so /usr/local/lib/libORISCore.so
+$ sudo ln -s /ORIS_AI/lib/aarch_64/libORISCUDA.so /usr/local/lib/libORISCUDA.so
 ```
 
 ## 6. How to run ORIS_AI
@@ -150,7 +154,9 @@ The binaries of example are located in the following path.
 
 When using GPU, the ORIS AI inference engine is executed as an asynchronous stream, and when using CUDA, if you want to measure the actual execution time of each step, you must use the sync option.
 
-#### 7-1. Yolov8 Official Model
+#### 7-1. YOLOv8 Official Model
+
+##### 7-1-1. YOLOv8n Detection
 - /ORIS_AI/src/oris_ai/examples/test_yolo_v8.cc
 ```
 Usage: ./test_yolo_v8 [OPTIONS]
@@ -162,7 +168,21 @@ Example:
   ./test_yolo_v8 -sync
 ```
 
-#### 7-2. Yolov11 Official Model
+##### 7-1-2. YOLOv8n Segmentation
+- /ORIS_AI/src/oris_ai/examples/test_yolo_v8_seg.cc
+```
+Usage: ./test_yolo_v8_seg [OPTIONS]
+Options:
+  -c      Use CPU for inference. Default is GPU.
+  -sync   Synchronize CUDA before timing. (For accurate GPU timing)
+Example:
+  ./test_yolo_v8_seg -c
+  ./test_yolo_v8_seg -sync
+```
+
+#### 7-2. YOLOv11 Official Model
+
+##### 7-2-1. YOLOv11n Detection
 - /ORIS_AI/src/oris_ai/examples/test_yolo_v11.cc
 ```
 Usage: ./test_yolo_v11 [OPTIONS]
@@ -172,4 +192,16 @@ Options:
 Example:
   ./test_yolo_v11 -c
   ./test_yolo_v11 -sync
+```
+
+##### 7-2-2. YOLOv11n Segmentation
+- /ORIS_AI/src/oris_ai/examples/test_yolo_v11_seg.cc
+```
+Usage: ./test_yolo_v11_seg [OPTIONS]
+Options:
+  -c      Use CPU for inference. Default is GPU.
+  -sync   Synchronize CUDA before timing. (For accurate GPU timing)
+Example:
+  ./test_yolo_v11_seg -c
+  ./test_yolo_v11_seg -sync
 ```
