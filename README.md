@@ -15,13 +15,9 @@ ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-d
 
 ## 3. Requirements
 
-- The command `dpkg -l | grep nvidia-l4t-core` outputs the version of the `nvidia-l4t-core` package (for example, `nvidia-l4t-core 36.4.4-xxxxxxxxxxxxxx`) rather than the JetPack label itself.
-- The `36.4.4` component maps to JetPack 6.2.1, so the JetPack version is inferred from this package version.
-
-
 Component | Recommended version | Command to check the version
 --------- | --------------- | ----------------------------
-JetPack | 6.2.1 | `dpkg -l \| grep nvidia-l4t-core`
+JetPack | 6.2.1 | `dpkg -l \| grep nvidia-jetpack`
 gcc/g++ | 11.4.0 | gcc --version
 cmake | ≥ 3.22.1 | cmake --version
 cudatoolkit | 12.6 | nvcc --version
