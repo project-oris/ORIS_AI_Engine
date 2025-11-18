@@ -201,3 +201,7 @@ Example:
   ./test_yolo_v11_seg -c
   ./test_yolo_v11_seg -sync
 ```
+
+## Acknowledgement
+
+This work was supported by Institute of Information & communications Technology Planning & Evaluation (IITP) grant funded by the Korea government(MSIT) (No. 2024-00339187, Core Technology Development of On-device Robot Intelligence SW Platform).
