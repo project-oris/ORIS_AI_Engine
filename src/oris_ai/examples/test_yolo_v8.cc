@@ -197,6 +197,18 @@ int main(int argc, char* argv[]) {
   model->CreateInputImageTensor(detect_height, detect_width, 255.0f);
   model->Open("../../test_model/yolov8n_oris_bn_merged.pb");
 
+  // GPU warmup with dummy data
+  if (device == oris_ai::Device::GPU) {
+    std::cout << "Warming up GPU with 5 iterations..." << std::endl;
+    cv::Mat dummy_image(detect_height, detect_width, CV_8UC3, cv::Scalar(114, 114, 114));
+    for (int w = 0; w < 5; ++w) {
+      model->SetInputImageTensor(dummy_image);
+      model->Forward();
+    }
+    cudaDeviceSynchronize();
+    std::cout << "Warmup complete." << std::endl;
+  }
+
   cv::Mat org_image;
   cv::Mat converted_img;
   cv::Mat input_image;
