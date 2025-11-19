@@ -220,33 +220,74 @@ Performance benchmarks measured after 5 warmup iterations for GPU inference.
 | YOLOv11n | Object Detection | 234 ms | 9.4 ~ 9.5 ms |
 | YOLOv11n | Instance Segmentation | 548 ms | 12.0 ~ 12.8 ms |
 
-## Robot Intelligence Neural Network Inference Results for Four Industrial Safety Demonstration Scenarios
+
+---
+
+## 9. Validation 
 
 This demonstration showcases real-time inference results from our robot intelligence neural network across four critical industrial safety scenarios. The system provides comprehensive hazard detection and monitoring capabilities for industrial facilities.
 
+*Real-time inference results demonstrating multi-scenario hazard detection capabilities*
+
+
 ---
 
-## Detection Capabilities
+### Detection
 
-### 🔥 **Hazard Event Detection**
-Real-time detection and warning display for fire and smoke incidents
-
-### 🦺 **Hazard Situation Detection**
+#### 🦺 Hazard Situation Detection
 Analysis and notification of worker PPE (Personal Protective Equipment) compliance status
 
-### 👤 **Hazard Personnel Detection**
+- **Neural Network**: YOLOv11 (Object Detection)
+- **Model Size**: 9.98 MB
+- **Inference Time**: 10.38 ms
+
+<div align="center">
+  <img src="./demo/2_Hazard_Situation_Detection_logo.gif" width="50%" alt="Hazard Situation Detection">
+  <p><em>Real-time PPE compliance monitoring detecting safety vest and helmet usage</em></p>
+</div>
+
+
+#### 👤 Hazard Personnel Detection
 Tracking and display of workers deviating from designated pathways
 
-### ⚠️ **Hazard Factor Detection**
+- **Neural Network**: YOLOv11 (Object Detection) + ByteTrack
+- **Model Size**: 13 MB
+- **Inference Time**: 31 ms
+- **Hardware Acceleration**: Mobilint NPU Accelerated LLM
+
+<div align="center">
+  <img src="./demo/3_Hazard_Personnel_Detection_logo.gif" width="50%" alt="Hazard Personnel Detection">
+  <p><em>Multi-object tracking system monitoring worker movement and pathway compliance</em></p>
+</div>
+
+
+#### ⚠️ Hazard Factor Detection
 Identification and marking of facility safety risk factors
+
+- **Neural Network**: YOLOv11 (Object Detection)
+- **Model Size**: 9.98 MB
+- **Inference Time**: 10.38 ms
+
+<div align="center">
+  <img src="./demo/4_Hazard_Factor_Detection_logo.gif" width="50%" alt="Hazard Factor Detection">
+  <p><em>Automated detection of facility risk factors including hazardous materials and unsafe conditions</em></p>
+</div>
 
 ---
 
-## ORIS_AI Output Visualization
+### Detection & Segmentation
 
-![ORIS AI Inference Results](./demo/ORIS_AI_Result_DEMO_GitHub.gif)
+#### 🔥 Hazard Event Detection
+Real-time detection and warning display for fire and smoke incidents
 
-*Real-time inference results demonstrating multi-scenario hazard detection capabilities*
+- **Neural Network**: YOLOv11 (Detection & Segmentation)
+- **Model Size**: 10.9 MB
+- **Inference Time**: 12.73 ms
+
+<div align="center">
+  <img src="./demo/1_Hazard_Event_Detection_logo.gif" width="50%" alt="Hazard Event Detection">
+  <p><em>Instance segmentation for precise fire and smoke detection with real-time alerting</em></p>
+</div>
 
 ## Acknowledgement
 
