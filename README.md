@@ -202,6 +202,24 @@ Example:
   ./test_yolo_v11_seg -sync
 ```
 
+## 8. Benchmark Results (Jetson ORIN AGX)
+
+Performance benchmarks measured after 5 warmup iterations for GPU inference.
+
+### YOLOv8n
+
+| Model | Task | CPU | GPU |
+|-------|------|-----|-----|
+| YOLOv8n | Object Detection | 248 ms | 8.5 ~ 9.0 ms |
+| YOLOv8n | Instance Segmentation | 538.7 ms | 10.5 ~ 11.0 ms |
+
+### YOLOv11n
+
+| Model | Task | CPU | GPU |
+|-------|------|-----|-----|
+| YOLOv11n | Object Detection | 234 ms | 9.4 ~ 9.5 ms |
+| YOLOv11n | Instance Segmentation | 548 ms | 12.0 ~ 12.8 ms |
+
 ## Robot Intelligence Neural Network Inference Results for Four Industrial Safety Demonstration Scenarios
 
 This demonstration showcases real-time inference results from our robot intelligence neural network across four critical industrial safety scenarios. The system provides comprehensive hazard detection and monitoring capabilities for industrial facilities.
