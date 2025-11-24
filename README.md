@@ -17,12 +17,12 @@ ORIS_AI is a deep learning framework specialized for on-device in the ORIS (On-d
 
 Component | Recommended version | Command to check the version
 --------- | --------------- | ----------------------------
-JetPack | 6.2.1 | `dpkg -l \| grep nvidia-jetpack`
+JetPack | 6.2.1 | `sudo apt show nvidia-jetpack`
 gcc/g++ | 11.4.0 | gcc --version
 cmake | ≥ 3.22.1 | cmake --version
 cudatoolkit | 12.6 | nvcc --version
 cudnn | 9.3 | cat {Your CUDNN Install Path}/cudnn_version.h | grep CUDNN_MAJOR -A 2
-opencv | 4.8 | python3 -c "import cv2; print(cv2.__version__)"
+opencv | 4.8 | `dpkg -l | grep libopencv`
 protobuf | 3.12.4 | protoc --version
 
 ## 4. Prerequisites
@@ -220,7 +220,6 @@ Performance benchmarks measured after 5 warmup iterations for GPU inference.
 | YOLOv11n | Object Detection | 234 ms | 9.4 ~ 9.5 ms |
 | YOLOv11n | Instance Segmentation | 548 ms | 12.0 ~ 12.8 ms |
 
-
 ---
 
 ## 9. Validation 
@@ -228,7 +227,6 @@ Performance benchmarks measured after 5 warmup iterations for GPU inference.
 This demonstration showcases real-time inference results from our robot intelligence neural network across four critical industrial safety scenarios. The system provides comprehensive hazard detection and monitoring capabilities for industrial facilities.
 
 *Real-time inference results demonstrating multi-scenario hazard detection capabilities*
-
 
 ---
 
@@ -240,6 +238,7 @@ Analysis and notification of worker PPE (Personal Protective Equipment) complian
 - **Neural Network**: YOLOv11 (Object Detection)
 - **Model Size**: 9.98 MB
 - **Inference Time**: 10.38 ms
+- **Hardware Acceleration**: AGX Orin GPU
 
 <div align="center">
   <img src="./demo/2_Hazard_Situation_Detection_logo.gif" width="50%" alt="Hazard Situation Detection">
@@ -253,7 +252,7 @@ Tracking and display of workers deviating from designated pathways
 - **Neural Network**: YOLOv11 (Object Detection) + ByteTrack
 - **Model Size**: 13 MB
 - **Inference Time**: 31 ms
-- **Hardware Acceleration**: Mobilint NPU Accelerated LLM
+- **Hardware Acceleration**: AGX Orin GPU
 
 <div align="center">
   <img src="./demo/3_Hazard_Personnel_Detection_logo.gif" width="50%" alt="Hazard Personnel Detection">
@@ -267,6 +266,7 @@ Identification and marking of facility safety risk factors
 - **Neural Network**: YOLOv11 (Object Detection)
 - **Model Size**: 9.98 MB
 - **Inference Time**: 10.38 ms
+- **Hardware Acceleration**: AGX Orin GPU
 
 <div align="center">
   <img src="./demo/4_Hazard_Factor_Detection_logo.gif" width="50%" alt="Hazard Factor Detection">
@@ -283,6 +283,7 @@ Real-time detection and warning display for fire and smoke incidents
 - **Neural Network**: YOLOv11 (Detection & Segmentation)
 - **Model Size**: 10.9 MB
 - **Inference Time**: 12.73 ms
+- **Hardware Acceleration**: AGX Orin GPU
 
 <div align="center">
   <img src="./demo/1_Hazard_Event_Detection_logo.gif" width="50%" alt="Hazard Event Detection">
