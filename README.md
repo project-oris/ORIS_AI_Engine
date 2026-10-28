@@ -32,6 +32,15 @@ For technology transfer, see [Inquiries](#inquiries).
 ## License
 
 ORIS AI is released under the MIT License. See [LICENSE](LICENSE).
+Third-party components and their licenses are listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+The release in preparation decodes images with stb_image and uses only the
+core and imgproc modules of the OpenCV installed on the platform
+(Apache-2.0); it does not use the OpenCV image and video codecs. An OpenCV
+build can include codecs under other licenses or patent terms, some with
+conditions for commercial use; their terms come with the OpenCV build that
+you install.
 
 ## Inquiries
 
