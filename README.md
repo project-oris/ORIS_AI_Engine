@@ -15,7 +15,7 @@ provide a Qwen3-VL command-line runner and the public headers of ORIS AI.
 The release in preparation provides Qwen3-VL 2B and 8B Instruct in Q8_0 for
 Jetson AGX Orin 64GB.
 
-ORIS AI also supports the following models through technology transfer.
+ORIS AI also supports the following models.
 
 | Model family | Task |
 |---|---|
@@ -27,7 +27,7 @@ ORIS AI also supports the following models through technology transfer.
 | EfficientViT-B0 | Classification |
 | ByteTrack / BoT-SORT with ReID | Multi-object tracking |
 
-For technology transfer, see [Inquiries](#inquiries).
+For details on using these models, see [Inquiries](#inquiries).
 
 ## License
 
@@ -44,8 +44,8 @@ you install.
 
 ## Inquiries
 
-For technology transfer, or for features not included in this release, see
-https://github.com/project-oris.
+For details on using ORIS AI, or on features not included in this release,
+see https://github.com/project-oris.
 
 ## Acknowledgement
 
