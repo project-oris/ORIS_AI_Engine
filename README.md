@@ -29,6 +29,20 @@ ORIS AI also supports the following models.
 
 For details on using these models, see [Inquiries](#inquiries).
 
+## Target platform
+
+The release in preparation targets the following platform and uses these
+platform libraries at run time.
+
+| Component | Version |
+|---|---|
+| Device | NVIDIA Jetson AGX Orin 64GB |
+| Jetson Linux | R36.4.7 (JetPack 6.2.1, Ubuntu 22.04) |
+| CUDA runtime | 12.6 (12.6.68) |
+| cuBLAS, cuBLASLt | 12.6.1.4 |
+| OpenCV core, imgproc | 4.8.0 |
+| glog | 0.4.0 (Ubuntu package 0.5.0+really0.4.0) |
+
 ## Model files
 
 The runner reads the Qwen3-VL GGUF files that Qwen publishes:
