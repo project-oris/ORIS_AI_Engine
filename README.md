@@ -7,12 +7,13 @@ Intelligence SW-System) project. It runs on NVIDIA GPUs with CUDA.
 
 ## Status
 
-A binary release for NVIDIA Jetson AGX Orin 64GB is in preparation. It will
-provide a Qwen3-VL command-line runner and the public headers of ORIS AI.
+This repository provides a binary release for NVIDIA Jetson AGX Orin 64GB:
+the Qwen3-VL command-line runner `bin/run_qwen3vl` and the public headers of
+ORIS AI.
 
 ## Models
 
-The release in preparation provides Qwen3-VL 2B and 8B Instruct in Q8_0 for
+This release provides Qwen3-VL 2B and 8B Instruct in Q8_0 for
 Jetson AGX Orin 64GB.
 
 ORIS AI also supports the following models.
@@ -31,7 +32,7 @@ For details on using these models, see [Inquiries](#inquiries).
 
 ## Target platform
 
-The release in preparation targets the following platform and uses these
+This release targets the following platform and uses these
 platform libraries at run time.
 
 | Component | Version |
@@ -62,11 +63,10 @@ the Apache License 2.0; see the model pages above for their terms.
 
 ## Running Qwen3-VL
 
-The `run_qwen3vl` binary of the release in preparation answers one prompt
-about one image:
+`bin/run_qwen3vl` answers one prompt about one image:
 
 ```sh
-run_qwen3vl --llm Qwen3VL-2B-Instruct-Q8_0.gguf \
+bin/run_qwen3vl --llm Qwen3VL-2B-Instruct-Q8_0.gguf \
   --mmproj mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf \
   --image photo.jpg --prompt "Describe this image in one sentence."
 ```
@@ -146,7 +146,7 @@ ORIS AI is released under the MIT License. See [LICENSE](LICENSE).
 Third-party components and their licenses are listed in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-The release in preparation decodes images with stb_image and uses only the
+This release decodes images with stb_image and uses only the
 core and imgproc modules of the OpenCV installed on the platform
 (Apache-2.0); it does not use the OpenCV image and video codecs. An OpenCV
 build can include codecs under other licenses or patent terms, some with

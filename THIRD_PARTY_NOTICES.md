@@ -1,11 +1,11 @@
 # Third-Party Notices
 
 ORIS AI is released under the MIT License (see [LICENSE](LICENSE)). The
-`run_qwen3vl` binary and the public headers of the release in preparation
+`run_qwen3vl` binary and the public headers of this release
 contain code from, or derived from, the third-party components below, each
 under its own license.
 
-The binary of the release in preparation is built with the NVIDIA CUDA
+The binary of this release is built with the NVIDIA CUDA
 Toolkit 12.6. It contains runtime registration code, device intrinsics and
 inline code of the CUDA headers, whose use is subject to the NVIDIA CUDA
 Toolkit End User License Agreement:
