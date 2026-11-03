@@ -41,7 +41,7 @@ platform libraries at run time.
 | CUDA runtime | 12.6 (12.6.68) |
 | cuBLAS, cuBLASLt | 12.6.1.4 |
 | OpenCV core, imgproc | 4.8.0 |
-| glog | 0.4.0 (Ubuntu package 0.5.0+really0.4.0) |
+| glog | 0.4.0 (Ubuntu package `libgoogle-glog0v5` 0.5.0+really0.4.0) |
 
 ## Model files
 
