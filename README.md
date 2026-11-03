@@ -101,6 +101,31 @@ start of the request to the last token and includes an untimed warmup pass.
 | 13 | The image cannot be read, or the prompt does not fit the limits |
 | 14 | Out of memory, or the run stopped on an internal error |
 
+## Public headers
+
+The headers under [include/](include) describe the ORIS AI runtime that is
+built into `run_qwen3vl`, as a reference for its API. The release has no
+library to link with them. They are fixed to the build configuration of the
+release, so they carry no build options, and their API may change between
+releases.
+
+## Runtime notes
+
+- The release runs Qwen3-VL without the device-specific optimizations of
+  ORIS AI; for optimized builds, see [Inquiries](#inquiries).
+- The runner only reads the model files; it writes nothing next to them.
+- `ORIS_*` environment variables set by the user are ignored when
+  `run_qwen3vl` runs. The variables named in the headers are for
+  development builds.
+
+## Troubleshooting
+
+| Exit code | What to check |
+|---|---|
+| 11 | The file names and SHA-256 values in [Model files](#model-files), and that `--llm` and `--mmproj` belong to the same model |
+| 13 | That the image is a JPEG or PNG file; for a long prompt, a larger `--max-prefill` or `--max-seq` |
+| 14 | Smaller `--max-seq`, `--max-prefill` or `--prefill-chunk`, a smaller image, or fewer other GPU programs |
+
 ## License
 
 ORIS AI is released under the MIT License. See [LICENSE](LICENSE).
