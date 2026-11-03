@@ -46,6 +46,61 @@ model file and the mmproj file of the same model.
 The model files are not part of this repository. Qwen releases them under
 the Apache License 2.0; see the model pages above for their terms.
 
+## Running Qwen3-VL
+
+The `run_qwen3vl` binary of the release in preparation answers one prompt
+about one image:
+
+```sh
+run_qwen3vl --llm Qwen3VL-2B-Instruct-Q8_0.gguf \
+  --mmproj mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf \
+  --image photo.jpg --prompt "Describe this image in one sentence."
+```
+
+| Option | Meaning |
+|---|---|
+| `--llm <path>` | Language model file (required) |
+| `--mmproj <path>` | mmproj file of the same model (required) |
+| `--image <path>` | Input image, JPEG or PNG (required) |
+| `--prompt <text>` | User prompt (default: "Describe this image in one sentence.") |
+| `-n <int>` | Maximum generated tokens (default 32) |
+| `--greedy` | Deterministic argmax selection (the default) |
+| `--temperature <float>`, `--top-k <int>`, `--top-p <float>` | Sampling; any of them selects sampling unless `--greedy` is given |
+| `--seed <int>` | Sampler seed (default 0) |
+| `--max-prefill <int>` | Longest accepted prompt in tokens, image included (default 2048) |
+| `--max-seq <int>` | KV cache length: prompt and generated tokens (default 4096) |
+| `--prefill-chunk <int>` | Largest prompt piece per forward pass (default 1024; 0 = whole prompt) |
+| `--kv-initial-tokens <int>` | Initial KV cache rows, grown up to `--max-seq` (default 1024; 0 = `--max-seq` at start) |
+
+### Input limits
+
+| Item | Limit |
+|---|---|
+| Conversation | One turn with one image and one prompt; the system prompt is "You are a helpful assistant" |
+| Image | Decoded with stb_image; EXIF orientation is not applied |
+| Image tokens | 8 to 4096 per image; each token covers 32 x 32 pixels |
+| Resize | The aspect ratio is kept, both sides are rounded to multiples of 32 and the area is fitted into 8192 to 4194304 pixels |
+| `--max-prefill` | Raised to the image tokens + 512 when it is smaller |
+| `--max-seq` | Raised to the image tokens + 512 + `-n` when it is smaller; keep it within the model context of 262144 tokens |
+| Generation | Stops at the end-of-turn token or after `-n` tokens |
+
+### Output
+
+The runner prints the model, the sampling settings, the image size and its
+image tokens, the generated text, why the generation ended (`eog` or
+`token-limit`), the number of generated tokens, and timing rows in the
+format of the llama.cpp performance report. The total time runs from the
+start of the request to the last token and includes an untimed warmup pass.
+
+| Exit code | Meaning |
+|---|---|
+| 0 | Success |
+| 2 | Invalid or missing option |
+| 7 | No `--image` |
+| 11 | The model files are not a Qwen3-VL Instruct Q8_0 pair |
+| 13 | The image cannot be read, or the prompt does not fit the limits |
+| 14 | Out of memory, or the run stopped on an internal error |
+
 ## License
 
 ORIS AI is released under the MIT License. See [LICENSE](LICENSE).
